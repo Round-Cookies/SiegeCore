@@ -1,0 +1,17 @@
+main: me.asakura_kukii.siegecore.SiegeCore
+version: 0.0.2
+api-version: 1.20
+name: SiegeCore
+commands:
+  SiegeCore:
+    description: Main argument for SiegeCore
+    aliases: [sc]
+permissions:
+  siegecore.admin:
+    description: 'Gives access to all admin commands for SiegeCore'
+    children:
+      siegecore.item: true
+      siegecore.io: true
+depend: []
+author:
+   Asakura_kukii
