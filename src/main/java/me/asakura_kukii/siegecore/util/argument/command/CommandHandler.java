@@ -30,6 +30,8 @@ public class CommandHandler {
                 return onInfo(sender, argument);
             case "item":
                 return CommandItem.onItem(sender, argument);
+            case "file":
+                return CommandFile.onFile(sender, argument);
             case "read":
                 if (!sender.hasPerm(pluginName + ".io")) {
                     sender.error("Missing permission");

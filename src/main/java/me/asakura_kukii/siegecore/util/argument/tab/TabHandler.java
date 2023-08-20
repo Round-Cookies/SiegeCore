@@ -28,8 +28,11 @@ public class TabHandler {
         switch (s) {
             case "item":
                 return TabItem.tabItem(sender, argument);
+            case "file":
+                return TabFile.tabFile(sender, argument);
             default:
                 if (PArgument.completeString("item", s)) sL.add("item");
+                if (PArgument.completeString("file", s)) sL.add("file");
                 if (PArgument.completeString("read", s)) sL.add("read");
                 if (PArgument.completeString("write", s)) sL.add("write");
                 if (PArgument.completeString("reload", s)) sL.add("reload");

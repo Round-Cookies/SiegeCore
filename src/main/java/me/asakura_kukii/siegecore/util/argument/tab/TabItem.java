@@ -71,6 +71,7 @@ public class TabItem {
     public static List<String> tabType(String s) {
         List<String> sL = new ArrayList<>();
         for (PType pT : PType.getPTypeList()) {
+            if (!pT.isItem) continue;
             if (PArgument.completeString(pT.id, s)) {
                 sL.add(pT.id);
             }
