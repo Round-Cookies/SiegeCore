@@ -1,5 +1,5 @@
 package me.asakura_kukii.siegecore.util.format;
-import me.asakura_kukii.siegecore.Main;
+import me.asakura_kukii.siegecore.SiegeCore;
 import me.asakura_kukii.siegecore.io.PFile;
 import me.asakura_kukii.siegecore.io.PType;
 import me.asakura_kukii.siegecore.unicode.PUnicode;
@@ -49,7 +49,7 @@ public class FormatHandler {
             assert pT != null;
             String[] subStringList = s.split("\\$");
             subStringList[0] = "";
-            Main.error(Arrays.toString(subStringList));
+            SiegeCore.error(Arrays.toString(subStringList));
             for (String subString : subStringList) {
                 if (subString.length() == 0) continue;
                 for (PFile pF : pT.getPFileList()) {

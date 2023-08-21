@@ -1,9 +1,8 @@
-package me.asakura_kukii.siegecore.util.argument.tab;
+package me.asakura_kukii.siegecore.argument.tab;
 
-import me.asakura_kukii.siegecore.io.PFile;
 import me.asakura_kukii.siegecore.io.PType;
-import me.asakura_kukii.siegecore.util.argument.PArgument;
-import me.asakura_kukii.siegecore.util.argument.PSender;
+import me.asakura_kukii.siegecore.argument.PArgument;
+import me.asakura_kukii.siegecore.argument.PSender;
 
 import java.util.ArrayList;
 import java.util.List;

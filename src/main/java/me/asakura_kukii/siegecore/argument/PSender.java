@@ -1,16 +1,18 @@
-package me.asakura_kukii.siegecore.util.argument;
+package me.asakura_kukii.siegecore.argument;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import static me.asakura_kukii.siegecore.Main.pluginPrefix;
-
 public class PSender {
 
-    public CommandSender sender = null;
+    public CommandSender sender;
+    public String pluginName;
+    public String pluginPrefix;
 
-    public PSender(CommandSender s) {
+    public PSender(String pluginName, String pluginPrefix, CommandSender s) {
+        this.pluginName = pluginName;
+        this.pluginPrefix = pluginPrefix;
         this.sender = s;
     }
 
@@ -19,6 +21,10 @@ public class PSender {
     }
 
     public void info(String s) {
+        sender.sendMessage(pluginPrefix + ChatColor.GREEN + s);
+    }
+
+    public void log(String s) {
         sender.sendMessage(pluginPrefix + ChatColor.WHITE + s);
     }
 
@@ -40,6 +46,6 @@ public class PSender {
 
     public boolean hasPerm(String s) {
         if (!isPlayer()) return true;
-        return sender.hasPermission(s);
+        return sender.hasPermission(pluginName + "." + s);
     }
 }

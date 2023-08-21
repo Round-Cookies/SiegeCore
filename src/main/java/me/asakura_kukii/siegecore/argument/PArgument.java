@@ -1,15 +1,17 @@
-package me.asakura_kukii.siegecore.util.argument;
+package me.asakura_kukii.siegecore.argument;
 
-import me.asakura_kukii.siegecore.Main;
+import me.asakura_kukii.siegecore.SiegeCore;
 import org.bukkit.ChatColor;
 
 public class PArgument {
     int current = 0;
     public String error = "";
+    public String label = "";
     public boolean success = true;
     private final String[] args;
 
-    public PArgument(String[] args){
+    public PArgument(String label, String[] args){
+        this.label = label;
         this.args = args;
     }
 
@@ -89,8 +91,7 @@ public class PArgument {
 
     public String nextString(){
         try{
-            String arg = args[current++];
-            return arg;
+            return args[current++];
         } catch (Exception e){
             current --;
             if (!hasNext()) {
@@ -108,7 +109,7 @@ public class PArgument {
     }
     public String colorize() {
         StringBuilder cSB = new StringBuilder();
-        cSB.append(ChatColor.GRAY).append("/").append(Main.pluginCode).append(" ");
+        cSB.append(ChatColor.GRAY).append("/").append(label).append(" ");
         int cSBI = 0;
         for (String s : args) {
             if(cSBI == 0) {

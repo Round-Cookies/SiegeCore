@@ -1,21 +1,15 @@
-package me.asakura_kukii.siegecore.util.argument.command;
+package me.asakura_kukii.siegecore.argument.command;
 
 import me.asakura_kukii.siegecore.io.PFile;
 import me.asakura_kukii.siegecore.io.PType;
-import me.asakura_kukii.siegecore.util.argument.PArgument;
-import me.asakura_kukii.siegecore.util.argument.PSender;
+import me.asakura_kukii.siegecore.argument.PArgument;
+import me.asakura_kukii.siegecore.argument.PSender;
 
 import java.util.List;
-
-import static me.asakura_kukii.siegecore.Main.pluginName;
 
 public class CommandFile {
 
     public static boolean onFile(PSender sender, PArgument argument) {
-        if (!sender.hasPerm(pluginName + ".file")) {
-            sender.error("Missing permission");
-            return false;
-        }
         String action = argument.nextString();
         if (!argument.success) {
             sender.error(argument.error);
@@ -38,7 +32,7 @@ public class CommandFile {
         }
         PType pT = PType.getPType(typeId);
         if (pT == null) {
-            sender.error("Invalid type");
+            sender.error("Invalid type_id");
             return false;
         }
         listFile(sender, pT);
@@ -48,14 +42,14 @@ public class CommandFile {
     public static void listFile(PSender sender, PType pT) {
         List<PFile> pFileList = pT.getPFileList();
         if (pFileList.size() == 0) {
-            sender.info("NO FILE");
+            sender.log("No file");
         } else if (pFileList.size() == 1) {
-            sender.info(pFileList.size() + " FILE LISTED:");
+            sender.log(pFileList.size() + " file listed:");
         } else {
-            sender.info(pFileList.size() + " FILES LISTED:");
+            sender.log(pFileList.size() + " files listed:");
         }
         for (PFile pF : pT.getPFileList()) {
-            sender.info("PATH: " + pF.file.getPath() + " FILE_ID: " + pF.id);
+            sender.log("path: " + pF.file.getPath() + " file_id: " + pF.id);
         }
     }
 }

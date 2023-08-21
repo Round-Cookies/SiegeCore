@@ -1,7 +1,7 @@
 package me.asakura_kukii.siegecore.io;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import me.asakura_kukii.siegecore.Main;
+import me.asakura_kukii.siegecore.SiegeCore;
 import me.asakura_kukii.siegecore.item.PItem;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -20,15 +20,11 @@ public class PType {
     public boolean isItem;
 
     public PType(JavaPlugin plugin, String id, Class<?> clazz) {
-        File pluginFolder = plugin.getDataFolder();
-        if (!pluginFolder.exists()) {
-            pluginFolder.mkdirs();
-        }
-        this.folder = new File(pluginFolder, id);
-        if (!this.folder.exists()) {
-            this.folder.mkdir();
-        }
         this.id = plugin.getName() + "." + id;
+        File pluginFolder = plugin.getDataFolder();
+        if (!pluginFolder.exists() && pluginFolder.mkdirs()) SiegeCore.log("Creating plugin folder [" + plugin.getName() + "]");
+        this.folder = new File(pluginFolder, id);
+        if (!this.folder.exists() && this.folder.mkdirs()) SiegeCore.log("Creating type folder [" + id + "]");
         this.clazz = clazz;
         this.isItem = false;
         Class<?> c = clazz.getSuperclass();
@@ -51,18 +47,19 @@ public class PType {
         return null;
     }
 
-    public void read() {
+    public void load() {
         pFileIdMap.clear();
-        readRecursively(this.folder);
+        loadRecursively(this.folder);
+        SiegeCore.log("Loaded " + pFileIdMap.size() + " files of type [" + id + "]");
     }
 
-    public void readRecursively(File f) {
+    public void loadRecursively(File f) {
         if (f.isDirectory()) {
-            for (File f2 : Objects.requireNonNull(f.listFiles())) readRecursively(f2);
+            for (File f2 : Objects.requireNonNull(f.listFiles())) loadRecursively(f2);
         } else {
             if (!f.getName().contains(".json")) return;
             ObjectMapper objectMapper = new ObjectMapper();
-            PFile pF = null;
+            PFile pF;
             try {
                 pF = (PFile) objectMapper.readValue(f, this.clazz);
                 pF.file = f;
@@ -70,13 +67,13 @@ public class PType {
                 pF.finalizeDeserialization();
                 this.pFileIdMap.put(pF.id, pF);
             } catch (IOException e) {
-                Main.error("Failed when loading [" + f.getName() + "] [" + e.getClass().getName() + "]");
-                Main.error(e.getLocalizedMessage());
+                SiegeCore.error("Failed when loading [" + f.getName() + "] [" + e.getClass().getName() + "]");
+                SiegeCore.error(e.getLocalizedMessage());
             }
         }
     }
 
-    public void write() {
+    public void save() {
         for (PFile pF : this.pFileIdMap.values()) {
             try {
                 FileWriter fileWriter = new FileWriter(pF.file);
@@ -85,8 +82,8 @@ public class PType {
                 fileWriter.flush();
                 fileWriter.close();
             } catch (IOException e) {
-                Main.error("Failed when writing [" + pF.file.getName() + "]");
-                Main.error(e.getLocalizedMessage());
+                SiegeCore.error("Failed when writing [" + pF.file.getName() + "]");
+                SiegeCore.error(e.getLocalizedMessage());
             }
         }
     }
@@ -102,7 +99,8 @@ public class PType {
         PType pT = new PType(plugin, id, clazz);
         pTypeIdMap.put(pT.id, pT);
         pTypeClazzMap.put(clazz, pT);
-        pT.read();
+        SiegeCore.log("Registered type [" + pT.id + "]");
+        pT.load();
     }
 
     public static PType getPType(String id) {
@@ -115,15 +113,15 @@ public class PType {
         return null;
     }
 
-    public static void readAll() {
+    public static void loadAll() {
         for (PType pT : pTypeIdMap.values()) {
-            pT.read();
+            pT.load();
         }
     }
 
-    public static void writeAll() {
+    public static void saveAll() {
         for (PType pT : pTypeIdMap.values()) {
-            pT.write();
+            pT.save();
         }
     }
 

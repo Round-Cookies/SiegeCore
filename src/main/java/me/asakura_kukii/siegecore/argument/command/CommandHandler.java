@@ -1,22 +1,14 @@
-package me.asakura_kukii.siegecore.util.argument.command;
+package me.asakura_kukii.siegecore.argument.command;
 
-import me.asakura_kukii.siegecore.io.PFile;
 import me.asakura_kukii.siegecore.io.PType;
-import me.asakura_kukii.siegecore.util.argument.PArgument;
-import me.asakura_kukii.siegecore.util.argument.PSender;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-
-import static me.asakura_kukii.siegecore.Main.pluginName;
-
+import me.asakura_kukii.siegecore.argument.PArgument;
+import me.asakura_kukii.siegecore.argument.PSender;
 
 public class CommandHandler {
 
-    public static boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
-        PArgument argument = new PArgument(args);
-        PSender sender = new PSender(commandSender);
+    public static boolean onCommand(PSender sender, PArgument argument) {
         sender.nextLine();
-        sender.info("Issued:");
+        sender.log("Issued:");
         sender.raw(">> " + argument.colorize());
 
         String s = argument.nextString();
@@ -29,30 +21,38 @@ public class CommandHandler {
             case "info":
                 return onInfo(sender, argument);
             case "item":
+                if (!sender.hasPerm("item")) {
+                    sender.error("Missing permission");
+                    return false;
+                }
                 return CommandItem.onItem(sender, argument);
             case "file":
+                if (!sender.hasPerm("file")) {
+                    sender.error("Missing permission");
+                    return false;
+                }
                 return CommandFile.onFile(sender, argument);
-            case "read":
-                if (!sender.hasPerm(pluginName + ".io")) {
+            case "load":
+                if (!sender.hasPerm("io")) {
                     sender.error("Missing permission");
                     return false;
                 }
-                PType.readAll();
+                PType.loadAll();
                 return true;
-            case "write":
-                if (!sender.hasPerm(pluginName + ".io")) {
+            case "save":
+                if (!sender.hasPerm("io")) {
                     sender.error("Missing permission");
                     return false;
                 }
-                PType.writeAll();
+                PType.saveAll();
                 return true;
             case "reload":
-                if (!sender.hasPerm(pluginName + ".io")) {
+                if (!sender.hasPerm("io")) {
                     sender.error("Missing permission");
                     return false;
                 }
-                PType.writeAll();
-                PType.readAll();
+                PType.saveAll();
+                PType.loadAll();
                 return true;
             default:
                 sender.error("Invalid sub-argument");
@@ -61,6 +61,7 @@ public class CommandHandler {
     }
 
     public static boolean onInfo(PSender sender, PArgument argument) {
+        sender.info("Standby!");
         return true;
     }
 }

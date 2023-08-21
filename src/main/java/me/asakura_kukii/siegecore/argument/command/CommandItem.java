@@ -1,24 +1,18 @@
-package me.asakura_kukii.siegecore.util.argument.command;
+package me.asakura_kukii.siegecore.argument.command;
 
 import me.asakura_kukii.siegecore.io.PFile;
 import me.asakura_kukii.siegecore.io.PType;
 import me.asakura_kukii.siegecore.item.PItem;
-import me.asakura_kukii.siegecore.util.argument.PArgument;
-import me.asakura_kukii.siegecore.util.argument.PSender;
+import me.asakura_kukii.siegecore.argument.PArgument;
+import me.asakura_kukii.siegecore.argument.PSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-import static me.asakura_kukii.siegecore.Main.*;
-
 public class CommandItem {
 
     public static boolean onItem(PSender sender, PArgument argument) {
-        if (!sender.hasPerm(pluginName + ".item")) {
-            sender.error("Missing permission");
-            return false;
-        }
         String action = argument.nextString();
         if (!argument.success) {
             sender.error(argument.error);
@@ -47,7 +41,7 @@ public class CommandItem {
         }
         PType pT = PType.getPType(typeId);
         if (pT == null || !pT.isItem) {
-            sender.error("Invalid type id");
+            sender.error("Invalid type_id");
             return false;
         }
         String fileId = argument.nextString();
@@ -56,7 +50,7 @@ public class CommandItem {
             return false;
         }
         if (pT.getPFile(fileId) == null) {
-            sender.error("Invalid file id");
+            sender.error("Invalid file_id");
             return false;
         }
         PItem pI = (PItem) pT.getPFile(fileId);
@@ -84,7 +78,7 @@ public class CommandItem {
         }
         PType pT = PType.getPType(typeId);
         if (pT == null || !pT.isItem) {
-            sender.error("Invalid type");
+            sender.error("Invalid type_id");
             return false;
         }
         listItem(sender, pT);
@@ -94,14 +88,14 @@ public class CommandItem {
     public static void listItem(PSender sender, PType pT) {
         List<PFile> pFileList = pT.getPFileList();
         if (pFileList.size() == 0) {
-            sender.info("NO ITEM");
+            sender.log("no item");
         } else if (pFileList.size() == 1) {
-            sender.info(pFileList.size() + " ITEM LISTED:");
+            sender.log(pFileList.size() + " item listed:");
         } else {
-            sender.info(pFileList.size() + " ITEMS LISTED:");
+            sender.log(pFileList.size() + " items listed:");
         }
         for (PFile pF : pT.getPFileList()) {
-            sender.info("PATH: " + pF.file.getPath() + " FILE_ID: " + pF.id);
+            sender.log("path: " + pF.file.getPath() + " file_id: " + pF.id);
         }
     }
 }

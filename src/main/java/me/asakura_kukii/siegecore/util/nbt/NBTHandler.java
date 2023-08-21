@@ -1,6 +1,6 @@
 package me.asakura_kukii.siegecore.util.nbt;
 
-import me.asakura_kukii.siegecore.Main;
+import me.asakura_kukii.siegecore.SiegeCore;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import org.bukkit.Bukkit;
@@ -41,8 +41,8 @@ public class NBTHandler {
         }
         CompoundTag root = nmsItemStack.getTag();
         assert root != null;
-        if (root.contains(Main.pluginName)) {
-            this.root = (CompoundTag) root.get(Main.pluginName);
+        if (root.contains(SiegeCore.pluginName)) {
+            this.root = (CompoundTag) root.get(SiegeCore.pluginName);
             valid = true;
         }
     }
@@ -104,8 +104,8 @@ public class NBTHandler {
         net.minecraft.world.item.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(iS.clone());
         CompoundTag NBTCompound = (nmsItemStack.hasTag()) ? nmsItemStack.getTag() : new CompoundTag();
         assert NBTCompound != null;
-        NBTCompound.remove(Main.pluginName);
-        NBTCompound.put(Main.pluginName, root);
+        NBTCompound.remove(SiegeCore.pluginName);
+        NBTCompound.put(SiegeCore.pluginName, root);
         nmsItemStack.setTag(NBTCompound);
         return CraftItemStack.asBukkitCopy(nmsItemStack);
     }

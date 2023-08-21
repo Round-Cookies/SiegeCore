@@ -1,9 +1,7 @@
-package me.asakura_kukii.siegecore.util.argument.tab;
+package me.asakura_kukii.siegecore.argument.tab;
 
-import me.asakura_kukii.siegecore.util.argument.PArgument;
-import me.asakura_kukii.siegecore.util.argument.PSender;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
+import me.asakura_kukii.siegecore.argument.PArgument;
+import me.asakura_kukii.siegecore.argument.PSender;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +14,7 @@ public class TabHandler {
         return sL;
     }
 
-    public static List<String> onTab(CommandSender commandSender, Command command, String alias, String[] args) {
-        PArgument argument = new PArgument(args);
-        PSender sender = new PSender(commandSender);
+    public static List<String> onTab(PSender sender, PArgument argument) {
         List<String> sL = new ArrayList<>();
 
         String s = argument.nextString();
@@ -31,10 +27,11 @@ public class TabHandler {
             case "file":
                 return TabFile.tabFile(sender, argument);
             default:
+                if (PArgument.completeString("info", s)) sL.add("info");
                 if (PArgument.completeString("item", s)) sL.add("item");
                 if (PArgument.completeString("file", s)) sL.add("file");
-                if (PArgument.completeString("read", s)) sL.add("read");
-                if (PArgument.completeString("write", s)) sL.add("write");
+                if (PArgument.completeString("load", s)) sL.add("load");
+                if (PArgument.completeString("save", s)) sL.add("save");
                 if (PArgument.completeString("reload", s)) sL.add("reload");
                 return noTabNext(sL, argument);
         }

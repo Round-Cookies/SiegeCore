@@ -11,6 +11,7 @@ permissions:
     description: 'Gives access to all admin commands for SiegeCore'
     children:
       siegecore.item: true
+      siegecore.file: true
       siegecore.io: true
 depend: []
 author:

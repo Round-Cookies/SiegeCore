@@ -3,7 +3,7 @@ package me.asakura_kukii.siegecore.io;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import me.asakura_kukii.siegecore.Main;
+import me.asakura_kukii.siegecore.SiegeCore;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -35,11 +35,11 @@ public abstract class PFile {
             try {
                 pF = (PFile) objectMapper.readValue(pF.file, pF.type.clazz);
                 pF.type.putPFile(pF.id, pF);
-                Main.info("Loaded [" + pF.file.getName() + "] [" + pF.id + "]");
+                SiegeCore.log("Loaded [" + pF.file.getName() + "] [" + pF.id + "]");
                 return pF;
             } catch (IOException e) {
-                Main.error("Failed when reading [" + pF.file.getName() + "]");
-                Main.error(e.getLocalizedMessage());
+                SiegeCore.error("Failed when reading [" + pF.file.getName() + "]");
+                SiegeCore.error(e.getLocalizedMessage());
             }
         }
         return null;
@@ -52,10 +52,10 @@ public abstract class PFile {
             fileWriter.write(pF.serialize());
             fileWriter.flush();
             fileWriter.close();
-            Main.info("Saved [" + pF.file.getName() + "] [" + pF.id + "]");
+            SiegeCore.log("Saved [" + pF.file.getName() + "] [" + pF.id + "]");
         } catch (IOException e) {
-            Main.error("Failed when writing [" + pF.file.getName() + "]");
-            Main.error(e.getLocalizedMessage());
+            SiegeCore.error("Failed when writing [" + pF.file.getName() + "]");
+            SiegeCore.error(e.getLocalizedMessage());
         }
     }
 }
