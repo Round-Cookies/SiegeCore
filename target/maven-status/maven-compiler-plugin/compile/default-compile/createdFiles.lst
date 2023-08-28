@@ -9,6 +9,7 @@ me\asakura_kukii\siegecore\io\PFileIdSerializer.class
 me\asakura_kukii\siegecore\SiegeCore$1.class
 me\asakura_kukii\siegecore\argument\command\CommandItem.class
 me\asakura_kukii\siegecore\item\PDeco.class
+me\asakura_kukii\siegecore\io\PFileIdKeyDeserializer.class
 me\asakura_kukii\siegecore\util\format\FormatHandler.class
 me\asakura_kukii\siegecore\SiegeCore.class
 me\asakura_kukii\siegecore\argument\tab\TabItem.class
