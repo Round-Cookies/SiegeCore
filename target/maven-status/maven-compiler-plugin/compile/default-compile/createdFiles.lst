@@ -2,8 +2,10 @@ me\asakura_kukii\siegecore\util\nbt\NBTType.class
 me\asakura_kukii\siegecore\argument\tab\TabHandler.class
 me\asakura_kukii\siegecore\argument\PSender.class
 me\asakura_kukii\siegecore\argument\PArgument.class
+me\asakura_kukii\siegecore\io\PFileIdDeserializer.class
 me\asakura_kukii\siegecore\argument\tab\TabFile.class
 me\asakura_kukii\siegecore\io\PType.class
+me\asakura_kukii\siegecore\io\PFileIdSerializer.class
 me\asakura_kukii\siegecore\SiegeCore$1.class
 me\asakura_kukii\siegecore\argument\command\CommandItem.class
 me\asakura_kukii\siegecore\item\PDeco.class

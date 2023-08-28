@@ -2,6 +2,7 @@ D:\siege\source\SiegeCore\src\main\java\me\asakura_kukii\siegecore\SiegeCore.jav
 D:\siege\source\SiegeCore\src\main\java\me\asakura_kukii\siegecore\argument\PSender.java
 D:\siege\source\SiegeCore\src\main\java\me\asakura_kukii\siegecore\io\PFile.java
 D:\siege\source\SiegeCore\src\main\java\me\asakura_kukii\siegecore\argument\tab\TabHandler.java
+D:\siege\source\SiegeCore\src\main\java\me\asakura_kukii\siegecore\io\PFileIdDeserializer.java
 D:\siege\source\SiegeCore\src\main\java\me\asakura_kukii\siegecore\argument\command\CommandItem.java
 D:\siege\source\SiegeCore\src\main\java\me\asakura_kukii\siegecore\argument\tab\TabItem.java
 D:\siege\source\SiegeCore\src\main\java\me\asakura_kukii\siegecore\argument\command\CommandFile.java
@@ -10,6 +11,7 @@ D:\siege\source\SiegeCore\src\main\java\me\asakura_kukii\siegecore\util\format\F
 D:\siege\source\SiegeCore\src\main\java\me\asakura_kukii\siegecore\argument\command\CommandHandler.java
 D:\siege\source\SiegeCore\src\main\java\me\asakura_kukii\siegecore\util\nbt\NBTType.java
 D:\siege\source\SiegeCore\src\main\java\me\asakura_kukii\siegecore\unicode\PUnicode.java
+D:\siege\source\SiegeCore\src\main\java\me\asakura_kukii\siegecore\io\PFileIdSerializer.java
 D:\siege\source\SiegeCore\src\main\java\me\asakura_kukii\siegecore\item\PDeco.java
 D:\siege\source\SiegeCore\src\main\java\me\asakura_kukii\siegecore\item\PItem.java
 D:\siege\source\SiegeCore\src\main\java\me\asakura_kukii\siegecore\util\nbt\NBTHandler.java

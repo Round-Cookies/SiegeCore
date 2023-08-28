@@ -3,6 +3,7 @@ package me.asakura_kukii.siegecore.io;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import me.asakura_kukii.siegecore.SiegeCore;
 
 import java.io.File;
@@ -25,7 +26,10 @@ public abstract class PFile {
 
     public PFile() {}
 
-    public abstract String serialize() throws JsonProcessingException;
+    public String serialize() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
+    }
 
     public abstract void finalizeDeserialization();
 
