@@ -1,17 +1,15 @@
 package me.asakura_kukii.siegecore.io;
 
-import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.KeyDeserializer;
 
 import java.io.IOException;
 
-public class PFileIdDeserializer extends JsonDeserializer<PFile> {
-
+public class PFileIdKeyDeserializer extends KeyDeserializer {
     @Override
-    public PFile deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        String s = jsonParser.getText();
+    public PFile deserializeKey(String s, DeserializationContext deserializationContext) throws IOException {
         if (!s.contains(".") && s.split("\\.").length != 3) throw new IOException("Could not resolve PFile [" + s + "]");
         String typeId = s.split("\\.")[0] + "." + s.split("\\.")[1];
         String fileId = s.split("\\.")[2];
