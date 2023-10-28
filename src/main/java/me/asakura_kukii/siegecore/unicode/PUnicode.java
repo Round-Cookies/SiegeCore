@@ -24,10 +24,6 @@ public class PUnicode extends PFile {
     @Override
     public String serialize() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addSerializer(PFile.class, new PFileIdSerializer());
-        simpleModule.addDeserializer(PFile.class, new PFileIdDeserializer());
-        objectMapper.registerModule(simpleModule);
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
     }
 

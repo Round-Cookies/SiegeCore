@@ -4,6 +4,7 @@ me\asakura_kukii\siegecore\argument\PSender.class
 me\asakura_kukii\siegecore\argument\PArgument.class
 me\asakura_kukii\siegecore\io\PFileIdDeserializer.class
 me\asakura_kukii\siegecore\argument\tab\TabFile.class
+me\asakura_kukii\siegecore\io\PFileIdKeySerializer.class
 me\asakura_kukii\siegecore\io\PType.class
 me\asakura_kukii\siegecore\io\PFileIdSerializer.class
 me\asakura_kukii\siegecore\SiegeCore$1.class

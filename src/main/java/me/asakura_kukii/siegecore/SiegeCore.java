@@ -2,12 +2,14 @@ package me.asakura_kukii.siegecore;
 
 import me.asakura_kukii.siegecore.io.PType;
 import me.asakura_kukii.siegecore.item.PDeco;
+import me.asakura_kukii.siegecore.trigger.PTriggerListener;
 import me.asakura_kukii.siegecore.unicode.PUnicode;
 import me.asakura_kukii.siegecore.argument.PArgument;
 import me.asakura_kukii.siegecore.argument.PSender;
 import me.asakura_kukii.siegecore.argument.command.CommandHandler;
 import me.asakura_kukii.siegecore.argument.tab.TabHandler;
 import me.asakura_kukii.siegecore.util.format.FormatHandler;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
@@ -33,6 +35,7 @@ public class SiegeCore extends JavaPlugin {
     public static HashMap<JavaPlugin, BukkitTask> updaterRegister = new HashMap<>();
 
     public static void registerEvent() {
+        Bukkit.getPluginManager().registerEvents(new PTriggerListener(), pluginInstance);
     }
 
     public static void registerType() {
