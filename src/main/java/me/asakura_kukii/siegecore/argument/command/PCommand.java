@@ -4,7 +4,7 @@ import me.asakura_kukii.siegecore.io.PType;
 import me.asakura_kukii.siegecore.argument.PArgument;
 import me.asakura_kukii.siegecore.argument.PSender;
 
-public class CommandHandler {
+public class PCommand {
 
     public static boolean onCommand(PSender sender, PArgument argument) {
         sender.nextLine();
@@ -25,13 +25,13 @@ public class CommandHandler {
                     sender.error("Missing permission");
                     return false;
                 }
-                return CommandItem.onItem(sender, argument);
+                return PCommandItem.onItem(sender, argument);
             case "file":
                 if (!sender.hasPerm("file")) {
                     sender.error("Missing permission");
                     return false;
                 }
-                return CommandFile.onFile(sender, argument);
+                return PCommandFile.onFile(sender, argument);
             case "load":
                 if (!sender.hasPerm("io")) {
                     sender.error("Missing permission");

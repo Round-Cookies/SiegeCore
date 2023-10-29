@@ -1,16 +1,15 @@
 package me.asakura_kukii.siegecore.trigger;
 
 public enum PTriggerType {
-    LEFT(true, false),
-    RIGHT(true, true),
-    SWAP(true, true),
-    SNEAK(true, true);
+    LEFT(false),
+    RIGHT(true),
+    SWAP(true),
+    DROP(false),
+    SNEAK(true);
 
-    public boolean flagClick = false;
     public boolean flagHold = false;
 
-    PTriggerType(boolean flagClick, boolean flagHold) {
-        this.flagClick = flagClick;
+    PTriggerType(boolean flagHold) {
         this.flagHold = flagHold;
     }
 }

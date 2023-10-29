@@ -7,7 +7,7 @@ import me.asakura_kukii.siegecore.argument.PSender;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TabFile {
+public class PTabFile {
     public static List<String> tabFile(PSender sender, PArgument argument) {
         List<String> sL = new ArrayList<>();
 
@@ -20,7 +20,7 @@ public class TabFile {
                 return tabFileList(sender, argument);
             default:
                 if (PArgument.completeString("list", s)) sL.add("list");
-                return TabHandler.noTabNext(sL, argument);
+                return PTab.noTabNext(sL, argument);
         }
     }
 
@@ -35,7 +35,7 @@ public class TabFile {
         if (PType.getPType(typeId) == null) {
             return tabType(typeId);
         }
-        return TabHandler.noTabNext(sL, argument);
+        return PTab.noTabNext(sL, argument);
     }
 
     public static List<String> tabType(String s) {

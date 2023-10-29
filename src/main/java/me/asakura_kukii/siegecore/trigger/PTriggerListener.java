@@ -1,60 +1,177 @@
 package me.asakura_kukii.siegecore.trigger;
 
-import me.asakura_kukii.siegecore.SiegeCore;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.*;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class PTriggerListener implements org.bukkit.event.Listener {
-    // Combined UUID
-    public static HashMap<String, BukkitTask> stateMap = new HashMap<>();
 
-    public static PTask pT = null;
+    public static HashMap<String, PTask> pTaskMap = new HashMap<>();
+
+    public static Set<UUID> dropBlockUUIDSet = new HashSet<>();
+
+    public static final Long holdDetectDelay = 5L;
+
+    @EventHandler
+    public void onDeath(PlayerDeathEvent e) {
+        for (PTriggerType pTT : PTriggerType.values()) {
+            String key = e.getEntity().getUniqueId() + pTT.name();
+            if (pTaskMap.containsKey(key)) {
+                pTaskMap.get(key).stop();
+            }
+        }
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent e) {
+        for (PTriggerType pTT : PTriggerType.values()) {
+            String key = e.getPlayer().getUniqueId() + pTT.name();
+            if (pTaskMap.containsKey(key)) {
+                pTaskMap.get(key).stop();
+            }
+        }
+    }
 
     @EventHandler
     public void onInteract(PlayerInteractEvent e) {
-        if (pT == null) {
-            pT = new PTask() {
+        if(e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK) {
+            if (dropBlockUUIDSet.contains(e.getPlayer().getUniqueId())) {
+                dropBlockUUIDSet.remove(e.getPlayer().getUniqueId());
+                return;
+            }
+            triggerEvent(e.getPlayer(), PTriggerType.LEFT);
+        }
+        if(e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            triggerEvent(e.getPlayer(), PTriggerType.RIGHT);
+        }
+    }
+
+    @EventHandler
+    public void onHit(EntityDamageByEntityEvent e) {
+        if (e.getDamager() instanceof Player) {
+            triggerEvent((Player) e.getDamager(), PTriggerType.LEFT);
+        }
+    }
+
+    @EventHandler
+    public void onInteractEntity(PlayerInteractEntityEvent e) {
+        triggerEvent(e.getPlayer(), PTriggerType.RIGHT);
+    }
+
+    @EventHandler
+    public void onSwap(PlayerSwapHandItemsEvent e) {
+        triggerEvent(e.getPlayer(), PTriggerType.SWAP);
+    }
+
+    @EventHandler
+    public void onSneak(PlayerToggleSneakEvent e) {
+        toggleEvent(e.getPlayer(), PTriggerType.SNEAK, e.getPlayer().isSneaking());
+    }
+
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent e) {
+        triggerEvent(e.getPlayer(), PTriggerType.DROP);
+        dropBlockUUIDSet.add(e.getPlayer().getUniqueId());
+    }
+
+    public boolean toggleEvent(LivingEntity lE, PTriggerType pTT, boolean previousState) {
+        String key = lE.getUniqueId() + pTT.name();
+        if (!pTT.flagHold) {
+            new PTask() {
+                @Override
+                public void init() {
+                    lE.sendMessage("INIT - " + pTT.name());
+                }
+
                 @Override
                 public void tick() {
-                    e.getPlayer().sendMessage("Timer - " + lifeTime);
                 }
 
                 @Override
                 public void goal() {
-
                 }
-            };
-            pT.runTaskTimer(SiegeCore.pluginInstance, 0, 1);
-        } else {
-            pT.lifeTime = 10L;
+            }.runPTask(1L);
+            return false;
         }
-    }
+        if (!previousState) {
+            if (pTaskMap.containsKey(key)) {
+                pTaskMap.get(key).stop();
+            }
+            pTaskMap.put(key, new PTask() {
+                @Override
+                public void init() {
+                    Bukkit.broadcastMessage("INIT - " + pTT.name());
+                }
 
-    public boolean toggleEvent(LivingEntity lE, PTriggerType pTT, boolean previousState) {
+                @Override
+                public void tick() {
+                    Bukkit.broadcastMessage("TICK - " + pTT.name());
+                }
+
+                @Override
+                public void goal() {
+                    Bukkit.broadcastMessage("GOAL - " + pTT.name());
+                    pTaskMap.remove(key);
+                }
+            }.runPTask());
+        } else {
+            if (pTaskMap.containsKey(key)) {
+                pTaskMap.get(key).stop();
+            }
+        }
         return false;
     }
 
     public boolean triggerEvent(LivingEntity lE, PTriggerType pTT) {
-        boolean flagCancel = false;
         String key = lE.getUniqueId() + pTT.name();
-        if (pTT.flagHold) {
-            if (stateMap.containsKey(lE.getUniqueId() + pTT.name())) {
+        if (!pTT.flagHold) {
+            new PTask() {
+                @Override
+                public void init() {
+                    lE.sendMessage("INIT - " + pTT.name());
+                }
 
-            } else {
+                @Override
+                public void tick() {
+                }
 
-            }
-            // check whether this event is a hold event
-            // if this event is a hold event, return immediately.
-        }
-        if (pTT.flagClick) {
+                @Override
+                public void goal() {
+                }
+            }.runPTask(1L);
             return false;
         }
-        boolean result = false;
-        // trigger the click, init 0 delay task (which is more responsive...)
-        return flagCancel;
+        if (pTaskMap.containsKey(key)) {
+            pTaskMap.get(key).setLifeTime(holdDetectDelay);
+        } else {
+            pTaskMap.put(key, new PTask() {
+                @Override
+                public void init() {
+                    lE.sendMessage("INIT - " + pTT.name());
+                }
+
+                @Override
+                public void tick() {
+                    lE.sendMessage("TICK - " + pTT.name());
+                }
+
+                @Override
+                public void goal() {
+                    lE.sendMessage("GOAL - " + pTT.name());
+                    pTaskMap.remove(key);
+                }
+            }.runPTask(holdDetectDelay));
+        }
+        return false;
     }
 }

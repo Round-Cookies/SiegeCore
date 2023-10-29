@@ -7,7 +7,7 @@ import me.asakura_kukii.siegecore.argument.PSender;
 
 import java.util.List;
 
-public class CommandFile {
+public class PCommandFile {
 
     public static boolean onFile(PSender sender, PArgument argument) {
         String action = argument.nextString();

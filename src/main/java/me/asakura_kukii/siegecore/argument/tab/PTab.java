@@ -6,7 +6,7 @@ import me.asakura_kukii.siegecore.argument.PSender;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TabHandler {
+public class PTab {
     public static List<String> noTabNext(List<String> sL, PArgument argument) {
         if (argument.nextString() != null) {
             sL.clear();
@@ -23,9 +23,9 @@ public class TabHandler {
         }
         switch (s) {
             case "item":
-                return TabItem.tabItem(sender, argument);
+                return PTabItem.tabItem(sender, argument);
             case "file":
-                return TabFile.tabFile(sender, argument);
+                return PTabFile.tabFile(sender, argument);
             default:
                 if (PArgument.completeString("info", s)) sL.add("info");
                 if (PArgument.completeString("item", s)) sL.add("item");

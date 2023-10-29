@@ -1,16 +1,17 @@
 package me.asakura_kukii.siegecore;
 
 import me.asakura_kukii.siegecore.io.PType;
-import me.asakura_kukii.siegecore.item.PDeco;
+import me.asakura_kukii.siegecore.io.PTypeListener;
+import me.asakura_kukii.siegecore.item.PItem;
+import me.asakura_kukii.siegecore.player.PPlayer;
 import me.asakura_kukii.siegecore.trigger.PTriggerListener;
 import me.asakura_kukii.siegecore.unicode.PUnicode;
 import me.asakura_kukii.siegecore.argument.PArgument;
 import me.asakura_kukii.siegecore.argument.PSender;
-import me.asakura_kukii.siegecore.argument.command.CommandHandler;
-import me.asakura_kukii.siegecore.argument.tab.TabHandler;
-import me.asakura_kukii.siegecore.util.format.FormatHandler;
+import me.asakura_kukii.siegecore.argument.command.PCommand;
+import me.asakura_kukii.siegecore.argument.tab.PTab;
+import me.asakura_kukii.siegecore.util.format.PFormat;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -36,18 +37,20 @@ public class SiegeCore extends JavaPlugin {
 
     public static void registerEvent() {
         Bukkit.getPluginManager().registerEvents(new PTriggerListener(), pluginInstance);
+        Bukkit.getPluginManager().registerEvents(new PTypeListener(), pluginInstance);
     }
 
     public static void registerType() {
-        PType.putPType(pluginInstance, "deco", PDeco.class);
+        PType.putPType(pluginInstance, "item", PItem.class);
         PType.putPType(pluginInstance, "unicode", PUnicode.class);
+        PType.putPType(pluginInstance, "player", PPlayer.class);
     }
 
     @Override
     public void onEnable() {
         server = getServer();
         pluginName = getName();
-        pluginPrefix = FormatHandler.format("&8[" + pluginColorCode + pluginName + "&8] &f");
+        pluginPrefix = PFormat.format("&8[" + pluginColorCode + pluginName + "&8] &f");
         consolePluginPrefix = "[" + pluginName + "]->>";
         info("Enabling " + pluginName);
         pluginInstance = this;
@@ -59,6 +62,11 @@ public class SiegeCore extends JavaPlugin {
 
         updater();
         info(pluginName + " enabled");
+
+        server.getScheduler().scheduleSyncDelayedTask(this, () -> {
+            info("Loading all types...");
+            PType.loadAll();
+        });
     }
 
     public void onDisable() {
@@ -82,9 +90,9 @@ public class SiegeCore extends JavaPlugin {
         String[] msgList = s.split("\n");
         for (String msg : msgList) {
             if (msg.trim().length() >= 200) {
-                raw(FormatHandler.ANSI_GREEN + consolePluginPrefix + msg.trim().substring(0, 199) + "..." + FormatHandler.ANSI_WHITE);
+                raw(PFormat.ANSI_GREEN + consolePluginPrefix + msg.trim().substring(0, 199) + "..." + PFormat.ANSI_WHITE);
             } else {
-                raw(FormatHandler.ANSI_GREEN + consolePluginPrefix + msg.trim() + FormatHandler.ANSI_WHITE);
+                raw(PFormat.ANSI_GREEN + consolePluginPrefix + msg.trim() + PFormat.ANSI_WHITE);
             }
         }
     }
@@ -93,9 +101,9 @@ public class SiegeCore extends JavaPlugin {
         String[] msgList = s.split("\n");
         for (String msg : msgList) {
             if (msg.trim().length() >= 200) {
-                raw(FormatHandler.ANSI_WHITE + consolePluginPrefix + msg.trim().substring(0, 199) + "..." + FormatHandler.ANSI_WHITE);
+                raw(PFormat.ANSI_WHITE + consolePluginPrefix + msg.trim().substring(0, 199) + "..." + PFormat.ANSI_WHITE);
             } else {
-                raw(FormatHandler.ANSI_WHITE + consolePluginPrefix + msg.trim() + FormatHandler.ANSI_WHITE);
+                raw(PFormat.ANSI_WHITE + consolePluginPrefix + msg.trim() + PFormat.ANSI_WHITE);
             }
         }
     }
@@ -104,9 +112,9 @@ public class SiegeCore extends JavaPlugin {
         String[] msgList = s.split("\n");
         for (String msg : msgList) {
             if (msg.trim().length() >= 200) {
-                raw(FormatHandler.ANSI_YELLOW + consolePluginPrefix + msg.trim().substring(0, 199) + "..." + FormatHandler.ANSI_WHITE);
+                raw(PFormat.ANSI_YELLOW + consolePluginPrefix + msg.trim().substring(0, 199) + "..." + PFormat.ANSI_WHITE);
             } else {
-                raw(FormatHandler.ANSI_YELLOW + consolePluginPrefix + msg.trim() + FormatHandler.ANSI_WHITE);
+                raw(PFormat.ANSI_YELLOW + consolePluginPrefix + msg.trim() + PFormat.ANSI_WHITE);
             }
         }
     }
@@ -115,9 +123,9 @@ public class SiegeCore extends JavaPlugin {
         String[] msgList = s.split("\n");
         for (String msg : msgList) {
             if (msg.trim().length() >= 200) {
-                raw(FormatHandler.ANSI_RED + consolePluginPrefix + msg.trim().substring(0, 199) + "..." + FormatHandler.ANSI_WHITE);
+                raw(PFormat.ANSI_RED + consolePluginPrefix + msg.trim().substring(0, 199) + "..." + PFormat.ANSI_WHITE);
             } else {
-                raw(FormatHandler.ANSI_RED + consolePluginPrefix + msg.trim() + FormatHandler.ANSI_WHITE);
+                raw(PFormat.ANSI_RED + consolePluginPrefix + msg.trim() + PFormat.ANSI_WHITE);
             }
         }
     }
@@ -132,7 +140,7 @@ public class SiegeCore extends JavaPlugin {
         if (args.length > 0) {
             PArgument argument = new PArgument(label, args);
             PSender sender = new PSender(pluginName, pluginPrefix, commandSender);
-            sL = TabHandler.onTab(sender, argument);
+            sL = PTab.onTab(sender, argument);
             return sL;
         }
         return sL;
@@ -143,7 +151,7 @@ public class SiegeCore extends JavaPlugin {
         if (command.getName().equalsIgnoreCase(pluginName)) {
             PArgument argument = new PArgument(label, args);
             PSender sender = new PSender(pluginName, pluginPrefix, commandSender);
-            return CommandHandler.onCommand(sender, argument);
+            return PCommand.onCommand(sender, argument);
         }
         return true;
     }

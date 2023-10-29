@@ -33,32 +33,16 @@ public abstract class PFile {
 
     public abstract void finalizeDeserialization();
 
-    public static PFile read(PFile pF) {
-        if (pF.file.exists()) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            try {
-                pF = (PFile) objectMapper.readValue(pF.file, pF.type.clazz);
-                pF.type.putPFile(pF.id, pF);
-                SiegeCore.log("Loaded [" + pF.file.getName() + "] [" + pF.id + "]");
-                return pF;
-            } catch (IOException e) {
-                SiegeCore.error("Failed when reading [" + pF.file.getName() + "]");
-                SiegeCore.error(e.getLocalizedMessage());
-            }
-        }
-        return null;
-    }
-
-    public static void write(PFile pF) {
+    public void write() {
         try {
-            FileWriter fileWriter = new FileWriter(pF.file);
+            FileWriter fileWriter = new FileWriter(this.file);
             fileWriter.write("");
-            fileWriter.write(pF.serialize());
+            fileWriter.write(this.serialize());
             fileWriter.flush();
             fileWriter.close();
-            SiegeCore.log("Saved [" + pF.file.getName() + "] [" + pF.id + "]");
+            SiegeCore.log("Saved [" + this.file.getName() + "] [" + this.type.id + "." + this.id + "]");
         } catch (IOException e) {
-            SiegeCore.error("Failed when writing [" + pF.file.getName() + "]");
+            SiegeCore.error("Failed when writing [" + this.file.getName() + "]");
             SiegeCore.error(e.getLocalizedMessage());
         }
     }

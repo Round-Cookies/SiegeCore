@@ -2,7 +2,7 @@ package me.asakura_kukii.siegecore.argument.command;
 
 import me.asakura_kukii.siegecore.io.PFile;
 import me.asakura_kukii.siegecore.io.PType;
-import me.asakura_kukii.siegecore.item.PItem;
+import me.asakura_kukii.siegecore.item.PAbstractItem;
 import me.asakura_kukii.siegecore.argument.PArgument;
 import me.asakura_kukii.siegecore.argument.PSender;
 import org.bukkit.entity.Player;
@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public class CommandItem {
+public class PCommandItem {
 
     public static boolean onItem(PSender sender, PArgument argument) {
         String action = argument.nextString();
@@ -53,7 +53,7 @@ public class CommandItem {
             sender.error("Invalid file_id");
             return false;
         }
-        PItem pI = (PItem) pT.getPFile(fileId);
+        PAbstractItem pI = (PAbstractItem) pT.getPFile(fileId);
         ItemStack iS = pI.getItemStack(1);
         if (sender.isPlayer()) {
             Player p = (Player) sender.sender;

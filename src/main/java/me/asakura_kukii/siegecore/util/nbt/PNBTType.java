@@ -1,6 +1,6 @@
 package me.asakura_kukii.siegecore.util.nbt;
 
-public enum NBTType {
+public enum PNBTType {
     Int,
     Boolean,
     Double,

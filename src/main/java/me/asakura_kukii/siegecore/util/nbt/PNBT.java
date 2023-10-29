@@ -11,17 +11,17 @@ import java.util.List;
 
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 
-public class NBTHandler {
+public class PNBT {
     public ItemStack iS;
     public boolean valid = false;
     public CompoundTag root = new CompoundTag();
 
-    public NBTHandler(ItemStack iS) {
+    public PNBT(ItemStack iS) {
         this.iS = iS;
         getRoot();
     }
 
-    public NBTHandler(Material m) {
+    public PNBT(Material m) {
         this.iS = new ItemStack(m);
         ItemMeta iM = iS.getItemMeta();
         if (iM == null) {
@@ -47,35 +47,35 @@ public class NBTHandler {
         }
     }
 
-    public Object get(String s, NBTType t) {
+    public Object get(String s, PNBTType t) {
         if (!valid) return null;
-        if (s.matches("") && t.equals(NBTType.Compound)) return root.toString();
+        if (s.matches("") && t.equals(PNBTType.Compound)) return root.toString();
         if (!root.contains(s)) return null;
-        if (t.equals(NBTType.Int)) return root.getInt(s);
-        if (t.equals(NBTType.Boolean)) return root.getBoolean(s);
-        if (t.equals(NBTType.Double)) return root.getDouble(s);
-        if (t.equals(NBTType.Float)) return root.getFloat(s);
-        if (t.equals(NBTType.String)) return root.getString(s);
-        if (t.equals(NBTType.Byte)) return root.getByte(s);
-        if (t.equals(NBTType.Long)) return root.getLong(s);
-        if (t.equals(NBTType.Compound)) return root.getCompound(s).toString();
-        if (t.equals(NBTType.IntArray)) return root.getIntArray(s);
-        if (t.equals(NBTType.ByteArray)) return root.getByteArray(s);
-        if (t.equals(NBTType.LongArray)) return root.getLongArray(s);
+        if (t.equals(PNBTType.Int)) return root.getInt(s);
+        if (t.equals(PNBTType.Boolean)) return root.getBoolean(s);
+        if (t.equals(PNBTType.Double)) return root.getDouble(s);
+        if (t.equals(PNBTType.Float)) return root.getFloat(s);
+        if (t.equals(PNBTType.String)) return root.getString(s);
+        if (t.equals(PNBTType.Byte)) return root.getByte(s);
+        if (t.equals(PNBTType.Long)) return root.getLong(s);
+        if (t.equals(PNBTType.Compound)) return root.getCompound(s).toString();
+        if (t.equals(PNBTType.IntArray)) return root.getIntArray(s);
+        if (t.equals(PNBTType.ByteArray)) return root.getByteArray(s);
+        if (t.equals(PNBTType.LongArray)) return root.getLongArray(s);
         return root.get(s);
     }
 
-    public void set(String s, Object o, NBTType t) {
+    public void set(String s, Object o, PNBTType t) {
         if (!valid) return;
         if (root.contains(s)) root.remove(s);
-        if (t.equals(NBTType.Int)) root.putInt(s, (int) o);
-        if (t.equals(NBTType.Boolean)) root.putBoolean(s, (Boolean) o);
-        if (t.equals(NBTType.Double)) root.putDouble(s, (Double) o);
-        if (t.equals(NBTType.Float)) root.putFloat(s, (Float) o);
-        if (t.equals(NBTType.String)) root.putString(s, (String) o);
-        if (t.equals(NBTType.Byte)) root.putByte(s, (Byte) o);
-        if (t.equals(NBTType.Long)) root.putLong(s, (Long) o);
-        if (t.equals(NBTType.Compound)) {
+        if (t.equals(PNBTType.Int)) root.putInt(s, (int) o);
+        if (t.equals(PNBTType.Boolean)) root.putBoolean(s, (Boolean) o);
+        if (t.equals(PNBTType.Double)) root.putDouble(s, (Double) o);
+        if (t.equals(PNBTType.Float)) root.putFloat(s, (Float) o);
+        if (t.equals(PNBTType.String)) root.putString(s, (String) o);
+        if (t.equals(PNBTType.Byte)) root.putByte(s, (Byte) o);
+        if (t.equals(PNBTType.Long)) root.putLong(s, (Long) o);
+        if (t.equals(PNBTType.Compound)) {
             try {
                 if (s.matches("")) {
                     root = TagParser.parseTag((String) o);
@@ -85,9 +85,9 @@ public class NBTHandler {
             } catch (Exception ignored) {
             }
         }
-        if (t.equals(NBTType.IntArray)) root.putIntArray(s, (List<Integer>) o);
-        if (t.equals(NBTType.ByteArray)) root.putByteArray(s, (List<Byte>) o);
-        if (t.equals(NBTType.LongArray)) root.putLongArray(s, (List<Long>) o);
+        if (t.equals(PNBTType.IntArray)) root.putIntArray(s, (List<Integer>) o);
+        if (t.equals(PNBTType.ByteArray)) root.putByteArray(s, (List<Byte>) o);
+        if (t.equals(PNBTType.LongArray)) root.putLongArray(s, (List<Long>) o);
     }
 
     public boolean has(String s) {

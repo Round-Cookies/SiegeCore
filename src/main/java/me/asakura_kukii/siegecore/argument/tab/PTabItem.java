@@ -8,7 +8,7 @@ import me.asakura_kukii.siegecore.argument.PSender;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TabItem {
+public class PTabItem {
     public static List<String> tabItem(PSender sender, PArgument argument) {
         List<String> sL = new ArrayList<>();
 
@@ -24,7 +24,7 @@ public class TabItem {
             default:
                 if (PArgument.completeString("give", s)) sL.add("give");
                 if (PArgument.completeString("list", s)) sL.add("list");
-                return TabHandler.noTabNext(sL, argument);
+                return PTab.noTabNext(sL, argument);
         }
     }
 
@@ -51,7 +51,7 @@ public class TabItem {
         if (pT.getPFile(fileId) == null) {
             return tabFile(pT, fileId);
         }
-        return TabHandler.noTabNext(sL, argument);
+        return PTab.noTabNext(sL, argument);
     }
 
     public static List<String> tabItemList(PSender sender, PArgument argument) {
@@ -65,13 +65,12 @@ public class TabItem {
         if (PType.getPType(typeId) == null) {
             return tabType(typeId);
         }
-        return TabHandler.noTabNext(sL, argument);
+        return PTab.noTabNext(sL, argument);
     }
 
     public static List<String> tabType(String s) {
         List<String> sL = new ArrayList<>();
-        for (PType pT : PType.getPTypeList()) {
-            if (!pT.isItem) continue;
+        for (PType pT : PType.getItemPTypeList()) {
             if (PArgument.completeString(pT.id, s)) {
                 sL.add(pT.id);
             }
