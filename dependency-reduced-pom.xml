@@ -4,7 +4,7 @@
   <groupId>me.asakura_kukii</groupId>
   <artifactId>SiegeCore</artifactId>
   <name>SiegeCore</name>
-  <version>0.0.3</version>
+  <version>0.0.5</version>
   <url>http://maven.apache.org</url>
   <build>
     <plugins>
