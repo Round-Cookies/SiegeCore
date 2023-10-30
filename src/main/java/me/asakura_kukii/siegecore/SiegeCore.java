@@ -4,7 +4,10 @@ import me.asakura_kukii.siegecore.io.PType;
 import me.asakura_kukii.siegecore.io.PTypeListener;
 import me.asakura_kukii.siegecore.item.PItem;
 import me.asakura_kukii.siegecore.player.PPlayer;
+import me.asakura_kukii.siegecore.trigger.PTrigger;
 import me.asakura_kukii.siegecore.trigger.PTriggerListener;
+import me.asakura_kukii.siegecore.trigger.PTriggerSubType;
+import me.asakura_kukii.siegecore.trigger.PTriggerType;
 import me.asakura_kukii.siegecore.unicode.PUnicode;
 import me.asakura_kukii.siegecore.argument.PArgument;
 import me.asakura_kukii.siegecore.argument.PSender;
@@ -15,6 +18,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -82,6 +86,9 @@ public class SiegeCore extends JavaPlugin {
         updaterRegister.put(pluginInstance, new BukkitRunnable() {
             @Override
             public void run() {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    PTrigger.trigger(p, PTriggerType.TICK, PTriggerSubType.HOLD);
+                }
             }
         }.runTaskTimer(pluginInstance , 0, 1));
     }
