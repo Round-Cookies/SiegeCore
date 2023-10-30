@@ -84,13 +84,13 @@ public class PTriggerListener implements org.bukkit.event.Listener {
         dropBlockUUIDSet.add(e.getPlayer().getUniqueId());
     }
 
-    public boolean toggleEvent(LivingEntity lE, PTriggerType pTT, boolean previousState) {
-        String key = lE.getUniqueId() + pTT.name();
+    public boolean toggleEvent(Player p, PTriggerType pTT, boolean previousState) {
+        String key = p.getUniqueId() + pTT.name();
         if (!pTT.flagHold) {
             new PTask() {
                 @Override
                 public void init() {
-                    lE.sendMessage("INIT - " + pTT.name());
+                    p.sendMessage("INIT - " + pTT.name());
                 }
 
                 @Override
@@ -132,13 +132,13 @@ public class PTriggerListener implements org.bukkit.event.Listener {
         return false;
     }
 
-    public boolean triggerEvent(LivingEntity lE, PTriggerType pTT) {
-        String key = lE.getUniqueId() + pTT.name();
+    public boolean triggerEvent(Player p, PTriggerType pTT) {
+        String key = p.getUniqueId() + pTT.name();
         if (!pTT.flagHold) {
             new PTask() {
                 @Override
                 public void init() {
-                    lE.sendMessage("INIT - " + pTT.name());
+                    PTrigger.trigger(p, pTT, PTriggerSubType.INIT);
                 }
 
                 @Override
@@ -157,17 +157,17 @@ public class PTriggerListener implements org.bukkit.event.Listener {
             pTaskMap.put(key, new PTask() {
                 @Override
                 public void init() {
-                    lE.sendMessage("INIT - " + pTT.name());
+                    p.sendMessage("INIT - " + pTT.name());
                 }
 
                 @Override
                 public void tick() {
-                    lE.sendMessage("TICK - " + pTT.name());
+                    p.sendMessage("TICK - " + pTT.name());
                 }
 
                 @Override
                 public void goal() {
-                    lE.sendMessage("GOAL - " + pTT.name());
+                    p.sendMessage("GOAL - " + pTT.name());
                     pTaskMap.remove(key);
                 }
             }.runPTask(holdDetectDelay));
