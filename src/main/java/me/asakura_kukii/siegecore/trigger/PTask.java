@@ -15,7 +15,7 @@ public abstract class PTask extends BukkitRunnable {
 
     public abstract void init();
 
-    public abstract void tick();
+    public abstract void hold();
 
     public abstract void goal();
 
@@ -56,7 +56,7 @@ public abstract class PTask extends BukkitRunnable {
             flagInit = false;
             init();
         } else {
-            tick();
+            hold();
         }
         if (this.flagLifeTime && this.lifeTime <= 0) {
             stop();
