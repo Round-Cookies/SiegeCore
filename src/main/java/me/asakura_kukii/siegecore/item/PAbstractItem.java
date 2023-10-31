@@ -42,6 +42,7 @@ public abstract class PAbstractItem extends PFile {
         PNBT nbt = new PNBT(material);
         nbt.set("type", type.id, PNBTType.String);
         nbt.set("id", id, PNBTType.String);
+        nbt.set("uuid", UUID.randomUUID(), PNBTType.String);
         ItemStack iS = nbt.toItemStack();
         ItemMeta iM = iS.getItemMeta();
         assert iM != null;

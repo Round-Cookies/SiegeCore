@@ -86,9 +86,7 @@ public class SiegeCore extends JavaPlugin {
         updaterRegister.put(pluginInstance, new BukkitRunnable() {
             @Override
             public void run() {
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    PTrigger.trigger(p, PTriggerType.TICK, PTriggerSubType.HOLD);
-                }
+                PTrigger.update();
             }
         }.runTaskTimer(pluginInstance , 0, 1));
     }
