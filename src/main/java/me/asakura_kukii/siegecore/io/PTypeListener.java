@@ -1,5 +1,6 @@
 package me.asakura_kukii.siegecore.io;
 
+import me.asakura_kukii.siegecore.player.PAbstractPlayer;
 import me.asakura_kukii.siegecore.trigger.PTriggerType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -13,6 +14,8 @@ public class PTypeListener implements org.bukkit.event.Listener {
             String id = e.getPlayer().getName();
             if (pT.getPFile(id) == null) {
                 pT.createPFile(id);
+            } else {
+                pT.getPFile(id);
             }
         }
     }
@@ -24,7 +27,7 @@ public class PTypeListener implements org.bukkit.event.Listener {
             if (pT.getPFile(id) == null) {
                 pT.createPFile(id);
             } else {
-                pT.getPFile(id).write();
+                pT.getPFile(id);
             }
         }
     }

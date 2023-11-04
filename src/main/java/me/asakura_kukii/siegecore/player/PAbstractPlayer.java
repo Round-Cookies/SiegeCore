@@ -6,6 +6,7 @@ import me.asakura_kukii.siegecore.io.PType;
 import org.bukkit.entity.Player;
 
 import java.io.File;
+import java.util.UUID;
 
 public abstract class PAbstractPlayer extends PFile {
 
@@ -15,6 +16,4 @@ public abstract class PAbstractPlayer extends PFile {
 
     public PAbstractPlayer() {}
 
-    @JsonIgnore
-    public Player p;
 }

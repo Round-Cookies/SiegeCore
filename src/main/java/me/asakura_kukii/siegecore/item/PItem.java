@@ -10,16 +10,21 @@ import java.io.File;
 
 public class PItem extends PAbstractItem {
 
-    @Override
-    public void trigger(LivingEntity lE, PTriggerType pTT, PTriggerSubType pTST, ItemStack iS, int slot) {
-        lE.sendMessage(pTT.name() + pTST.name() + iS.getType().name() + slot);
-    }
-
     public PItem(String id, File file, PType type) {
         super(id, file, type);
     }
 
     public PItem() {}
+
+    @Override
+    public void trigger(LivingEntity lE, PTriggerType pTT, PTriggerSubType pTST, ItemStack iS, int slot) {
+        lE.sendMessage(pTT.name() + pTST.name() + iS.getType().name() + slot);
+    }
+
+    @Override
+    public ItemStack finalizeGetItemStack(ItemStack iS) {
+        return iS;
+    }
 
     @Override
     public void finalizeDeserialization() {}

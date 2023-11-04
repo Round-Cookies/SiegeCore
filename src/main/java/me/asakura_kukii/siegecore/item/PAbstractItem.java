@@ -26,6 +26,8 @@ public abstract class PAbstractItem extends PFile {
 
     public abstract void trigger(LivingEntity lE, PTriggerType pTT, PTriggerSubType pTST, ItemStack iS, int slot);
 
+    public abstract ItemStack finalizeGetItemStack(ItemStack iS);
+
     public PAbstractItem(String id, File file, PType type) {
         super(id, file, type);
     }
@@ -42,6 +44,7 @@ public abstract class PAbstractItem extends PFile {
         PNBT nbt = new PNBT(material);
         nbt.set("type", type.id, PNBTType.String);
         nbt.set("id", id, PNBTType.String);
+        nbt.set("uuid", UUID.randomUUID().toString(), PNBTType.String);
         ItemStack iS = nbt.toItemStack();
         ItemMeta iM = iS.getItemMeta();
         assert iM != null;
@@ -53,7 +56,7 @@ public abstract class PAbstractItem extends PFile {
         iM.setLore(PFormat.format(lore));
         iS.setItemMeta(iM);
         iS.setAmount(amount);
-        return iS;
+        return finalizeGetItemStack(iS);
     }
 
     @JsonIgnore
@@ -65,10 +68,31 @@ public abstract class PAbstractItem extends PFile {
         }
         PType pT = PType.getPType((String) nbt.get("type", PNBTType.String));
         String id = (String) nbt.get("id", PNBTType.String);
-        if (pT == null || !pT.isItem || id == null) {
+        String uuidString = (String) nbt.get("uuid", PNBTType.String);
+        if (pT == null || !pT.isItem || id == null || uuidString == null) {
             return null;
         }
         return (PAbstractItem) pT.getPFile(id);
+    }
+
+    @JsonIgnore
+    public static String getUUID(ItemStack iS) {
+        if (iS == null) return null;
+        PNBT nbt = new PNBT(iS);
+        if (!nbt.valid) {
+            return null;
+        }
+        PType pT = PType.getPType((String) nbt.get("type", PNBTType.String));
+        String id = (String) nbt.get("id", PNBTType.String);
+        String uuidString = (String) nbt.get("uuid", PNBTType.String);
+        if (pT == null || !pT.isItem || id == null || uuidString == null) {
+            return null;
+        }
+        try {
+            return uuidString;
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 
     @JsonIgnore
