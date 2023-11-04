@@ -88,6 +88,11 @@ public class PTriggerListener implements org.bukkit.event.Listener {
     }
 
     @EventHandler
+    public void onSprint(PlayerToggleSprintEvent e) {
+        toggleEvent(e.getPlayer(), PTriggerType.SPRINT, e.getPlayer().isSprinting());
+    }
+
+    @EventHandler
     public void onDrop(PlayerDropItemEvent e) {
         triggerEvent(e.getPlayer(), PTriggerType.DROP);
         dropBlockUUIDSet.add(e.getPlayer().getUniqueId());
@@ -99,7 +104,11 @@ public class PTriggerListener implements org.bukkit.event.Listener {
             new PTask() {
                 @Override
                 public void init() {
-                    PTrigger.trigger(p, pTT, PTriggerSubType.INIT);
+                    if (!previousState) {
+                        PTrigger.trigger(p, pTT, PTriggerSubType.INIT);
+                    } else {
+                        PTrigger.trigger(p, pTT, PTriggerSubType.GOAL);
+                    }
                 }
 
                 @Override
