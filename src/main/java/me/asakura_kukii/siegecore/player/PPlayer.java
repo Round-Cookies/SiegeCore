@@ -4,10 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import me.asakura_kukii.siegecore.SiegeCore;
 import me.asakura_kukii.siegecore.io.PType;
 import me.asakura_kukii.siegecore.item.PAbstractItem;
+import me.asakura_kukii.siegecore.util.math.PMath;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
+import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
+import org.joml.Vector3f;
 
 import java.io.File;
 import java.util.*;
@@ -43,12 +47,12 @@ public class PPlayer extends PAbstractPlayer{
         equipmentUUIDList.set(3, PAbstractItem.getUUID(p.getInventory().getChestplate()));
         equipmentUUIDList.set(4, PAbstractItem.getUUID(p.getInventory().getLeggings()));
         equipmentUUIDList.set(5, PAbstractItem.getUUID(p.getInventory().getBoots()));
-        equipmentItemStackList.set(0, p.getInventory().getItemInMainHand());
-        equipmentItemStackList.set(1, p.getInventory().getItemInOffHand());
-        equipmentItemStackList.set(2, p.getInventory().getHelmet());
-        equipmentItemStackList.set(3, p.getInventory().getChestplate());
-        equipmentItemStackList.set(4, p.getInventory().getLeggings());
-        equipmentItemStackList.set(5, p.getInventory().getBoots());
+        if (p.getInventory().getItemInMainHand() != null) equipmentItemStackList.set(0, p.getInventory().getItemInMainHand().clone());
+        if (p.getInventory().getItemInOffHand() != null) equipmentItemStackList.set(1, p.getInventory().getItemInOffHand().clone());
+        if (p.getInventory().getHelmet() != null) equipmentItemStackList.set(2, p.getInventory().getHelmet().clone());
+        if (p.getInventory().getChestplate() != null) equipmentItemStackList.set(3, p.getInventory().getChestplate().clone());
+        if (p.getInventory().getLeggings() != null) equipmentItemStackList.set(4, p.getInventory().getLeggings().clone());
+        if (p.getInventory().getBoots() != null) equipmentItemStackList.set(5, p.getInventory().getBoots().clone());
         for (int i = 0; i < 6; i++) {
             if (!(Objects.equals(this.equipmentUUIDList.get(i), equipmentUUIDList.get(i)))) {
                 if (this.equipmentUUIDList.get(i) != null) {

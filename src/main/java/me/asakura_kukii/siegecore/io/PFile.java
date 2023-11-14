@@ -33,17 +33,18 @@ public abstract class PFile {
 
     public abstract void finalizeDeserialization();
 
-    public void write() {
+    public boolean write() {
         try {
             FileWriter fileWriter = new FileWriter(this.file);
             fileWriter.write("");
             fileWriter.write(this.serialize());
             fileWriter.flush();
             fileWriter.close();
-            SiegeCore.log("Saved [" + this.file.getName() + "] [" + this.type.id + "." + this.id + "]");
+            return true;
         } catch (IOException e) {
             SiegeCore.error("Failed when writing [" + this.file.getName() + "]");
             SiegeCore.error(e.getLocalizedMessage());
+            return false;
         }
     }
 }

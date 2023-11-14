@@ -13,9 +13,9 @@ public class PTypeListener implements org.bukkit.event.Listener {
         for (PType pT : PType.getPlayerPTypeList()) {
             String id = e.getPlayer().getName();
             if (pT.getPFile(id) == null) {
-                pT.createPFile(id);
+                pT.createPFile(id).write();
             } else {
-                pT.getPFile(id);
+                pT.getPFile(id).write();
             }
         }
     }
@@ -25,9 +25,9 @@ public class PTypeListener implements org.bukkit.event.Listener {
         for (PType pT : PType.getPlayerPTypeList()) {
             String id = e.getPlayer().getName();
             if (pT.getPFile(id) == null) {
-                pT.createPFile(id);
+                pT.createPFile(id).write();
             } else {
-                pT.getPFile(id);
+                pT.getPFile(id).write();
             }
         }
     }

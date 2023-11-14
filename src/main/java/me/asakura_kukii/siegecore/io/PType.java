@@ -106,17 +106,7 @@ public class PType {
     public void save() {
         int successCount = 0;
         for (PFile pF : this.pFileIdMap.values()) {
-            try {
-                FileWriter fileWriter = new FileWriter(pF.file);
-                fileWriter.write("");
-                fileWriter.write(pF.serialize());
-                fileWriter.flush();
-                fileWriter.close();
-                successCount = successCount + 1;
-            } catch (IOException e) {
-                SiegeCore.error("Failed when writing [" + pF.file.getName() + "]");
-                SiegeCore.error(e.getLocalizedMessage());
-            }
+            if (pF.write()) successCount = successCount + 1;
         }
         SiegeCore.log("Saved " + successCount + " files of type [" + this.id + "]");
     }

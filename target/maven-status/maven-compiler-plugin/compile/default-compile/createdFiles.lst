@@ -1,3 +1,4 @@
+me\asakura_kukii\siegecore\effect\PParticle.class
 me\asakura_kukii\siegecore\trigger\PTriggerListener$2.class
 me\asakura_kukii\siegecore\argument\command\PCommandFile.class
 me\asakura_kukii\siegecore\argument\tab\PTabFile.class
@@ -6,11 +7,13 @@ me\asakura_kukii\siegecore\argument\tab\PTabItem.class
 me\asakura_kukii\siegecore\io\PFileIdDeserializer.class
 me\asakura_kukii\siegecore\item\PAbstractItem.class
 me\asakura_kukii\siegecore\argument\tab\PTab.class
+me\asakura_kukii\siegecore\effect\PSound.class
 me\asakura_kukii\siegecore\trigger\PTriggerListener$4.class
 me\asakura_kukii\siegecore\io\PFileIdKeySerializer.class
 me\asakura_kukii\siegecore\io\PType.class
 me\asakura_kukii\siegecore\SiegeCore$1.class
 me\asakura_kukii\siegecore\argument\command\PCommand.class
+me\asakura_kukii\siegecore\effect\PPotion.class
 me\asakura_kukii\siegecore\io\PFileIdKeyDeserializer.class
 me\asakura_kukii\siegecore\trigger\PTriggerSubType.class
 me\asakura_kukii\siegecore\util\nbt\PNBTType.class
@@ -23,12 +26,17 @@ me\asakura_kukii\siegecore\player\PPlayer.class
 me\asakura_kukii\siegecore\argument\PSender.class
 me\asakura_kukii\siegecore\argument\PArgument.class
 me\asakura_kukii\siegecore\util\format\PFormat.class
+me\asakura_kukii\siegecore\util\math\PVectorDeserializer.class
 me\asakura_kukii\siegecore\trigger\PTriggerListener$1.class
 me\asakura_kukii\siegecore\io\PFileIdSerializer.class
 me\asakura_kukii\siegecore\io\PTypeListener.class
 me\asakura_kukii\siegecore\player\PAbstractPlayer.class
+me\asakura_kukii\siegecore\util\math\PMath.class
 me\asakura_kukii\siegecore\SiegeCore.class
+me\asakura_kukii\siegecore\util\math\PVector.class
+me\asakura_kukii\siegecore\util\math\PVectorSerializer.class
 me\asakura_kukii\siegecore\io\PFile.class
 me\asakura_kukii\siegecore\trigger\PTask.class
+me\asakura_kukii\siegecore\util\math\PAxis.class
 me\asakura_kukii\siegecore\trigger\PTriggerType.class
 me\asakura_kukii\siegecore\trigger\PTriggerListener.class

@@ -53,7 +53,7 @@ public class PTrigger {
             for (Integer key : equipItemStackMap.keySet()) {
                 PAbstractItem.checkTrigger(p, PTriggerType.EQUIP, PTriggerSubType.INIT, equipItemStackMap.get(key), key);
             }
-            PTrigger.trigger(p, PTriggerType.TICK, PTriggerSubType.HOLD);
+            //PTrigger.trigger(p, PTriggerType.TICK, PTriggerSubType.HOLD);
         }
     }
 }
