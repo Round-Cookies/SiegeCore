@@ -1,9 +1,12 @@
 package me.asakura_kukii.siegecore;
 
+import me.asakura_kukii.siegecore.effect.PParticle;
+import me.asakura_kukii.siegecore.effect.PSound;
 import me.asakura_kukii.siegecore.io.PType;
 import me.asakura_kukii.siegecore.io.PTypeListener;
 import me.asakura_kukii.siegecore.item.PItem;
 import me.asakura_kukii.siegecore.player.PPlayer;
+import me.asakura_kukii.siegecore.stringanim.PStringAnim;
 import me.asakura_kukii.siegecore.trigger.PTrigger;
 import me.asakura_kukii.siegecore.trigger.PTriggerListener;
 import me.asakura_kukii.siegecore.trigger.PTriggerSubType;
@@ -37,6 +40,7 @@ public class SiegeCore extends JavaPlugin {
     public static String consolePluginPrefix;
     public static JavaPlugin pluginInstance = null;
     public static File pluginFolder = null;
+    public static long runTickTime = 0L;
     public static HashMap<JavaPlugin, BukkitTask> updaterRegister = new HashMap<>();
 
     public static void registerEvent() {
@@ -45,8 +49,11 @@ public class SiegeCore extends JavaPlugin {
     }
 
     public static void registerType() {
+        PType.putPType(pluginInstance, "particle", PParticle.class);
+        PType.putPType(pluginInstance, "sound", PSound.class);
         PType.putPType(pluginInstance, "item", PItem.class);
         PType.putPType(pluginInstance, "unicode", PUnicode.class);
+        PType.putPType(pluginInstance, "stringanim", PStringAnim.class);
         PType.putPType(pluginInstance, "player", PPlayer.class);
     }
 
@@ -86,6 +93,7 @@ public class SiegeCore extends JavaPlugin {
         updaterRegister.put(pluginInstance, new BukkitRunnable() {
             @Override
             public void run() {
+                SiegeCore.runTickTime = SiegeCore.runTickTime + 1;
                 PTrigger.update();
             }
         }.runTaskTimer(pluginInstance , 0, 1));

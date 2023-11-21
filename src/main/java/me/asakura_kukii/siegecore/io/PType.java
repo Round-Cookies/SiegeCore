@@ -77,8 +77,20 @@ public class PType {
         return null;
     }
 
+    public PFile getDefault() {
+        if (this.pFileIdMap.containsKey("default")) return this.pFileIdMap.get("default");
+        createDefault();
+        return this.pFileIdMap.get("default");
+    }
+
+    public void createDefault() {
+        PFile pF = createPFile("default");
+        if (pF != null) pF.defaultValue();
+    }
+
     public void load() {
         pFileIdMap.clear();
+        createDefault();
         loadRecursively(this.folder);
         SiegeCore.log("Loaded " + pFileIdMap.size() + " files of type [" + id + "]");
     }
@@ -106,17 +118,7 @@ public class PType {
     public void save() {
         int successCount = 0;
         for (PFile pF : this.pFileIdMap.values()) {
-            try {
-                FileWriter fileWriter = new FileWriter(pF.file);
-                fileWriter.write("");
-                fileWriter.write(pF.serialize());
-                fileWriter.flush();
-                fileWriter.close();
-                successCount = successCount + 1;
-            } catch (IOException e) {
-                SiegeCore.error("Failed when writing [" + pF.file.getName() + "]");
-                SiegeCore.error(e.getLocalizedMessage());
-            }
+            if (pF.write()) successCount = successCount + 1;
         }
         SiegeCore.log("Saved " + successCount + " files of type [" + this.id + "]");
     }

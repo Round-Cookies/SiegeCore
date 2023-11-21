@@ -4,7 +4,7 @@
   <groupId>me.asakura_kukii</groupId>
   <artifactId>SiegeCore</artifactId>
   <name>SiegeCore</name>
-  <version>0.0.5</version>
+  <version>1.0.1</version>
   <url>http://maven.apache.org</url>
   <build>
     <plugins>
@@ -78,6 +78,13 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>8</source>
+          <target>8</target>
+        </configuration>
       </plugin>
     </plugins>
   </build>

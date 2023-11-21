@@ -2,6 +2,8 @@ package me.asakura_kukii.siegecore.unicode;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import me.asakura_kukii.siegecore.io.PFile;
 import me.asakura_kukii.siegecore.io.PFileIdDeserializer;
@@ -19,6 +21,8 @@ public class PUnicode extends PFile {
 
     public PUnicode() {}
 
+    @JsonSerialize(contentUsing = PUnicodeStringSerializer.class)
+    @JsonDeserialize(contentUsing = PUnicodeStringDeserializer.class)
     public HashMap<String, String> map = new HashMap<>();
 
     @Override
@@ -29,5 +33,11 @@ public class PUnicode extends PFile {
 
     @Override
     public void finalizeDeserialization() {
+
+    }
+
+    @Override
+    public void defaultValue() {
+
     }
 }

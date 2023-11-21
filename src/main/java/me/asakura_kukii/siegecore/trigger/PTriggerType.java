@@ -6,6 +6,7 @@ public enum PTriggerType {
     SWAP(true, 12L),
     DROP(false, 12L),
     SNEAK(true, 0L),
+    SPRINT(false, 0L),
     TICK(false, 0L),
     EQUIP(false, 0L),
     STOCK(false, 0L)

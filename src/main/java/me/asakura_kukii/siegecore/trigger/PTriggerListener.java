@@ -1,6 +1,7 @@
 package me.asakura_kukii.siegecore.trigger;
 
 import me.asakura_kukii.siegecore.SiegeCore;
+import me.asakura_kukii.siegecore.item.PAbstractItem;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
@@ -8,7 +9,10 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
@@ -21,6 +25,7 @@ public class PTriggerListener implements org.bukkit.event.Listener {
     public static HashMap<String, PTask> pTaskMap = new HashMap<>();
 
     public static Set<UUID> dropBlockUUIDSet = new HashSet<>();
+
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
         for (PTriggerType pTT : PTriggerType.values()) {
@@ -42,44 +47,64 @@ public class PTriggerListener implements org.bukkit.event.Listener {
     }
 
     @EventHandler
+    public void onDrop(PlayerDropItemEvent e) {
+        // Block action if the item is locked
+        if (PAbstractItem.getLock(e.getItemDrop().getItemStack())) e.setCancelled(true);
+        // If player drops an item, a left click event will fire afterwards, block it using this set
+        dropBlockUUIDSet.add(e.getPlayer().getUniqueId());
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent e) {
+        // Block action if the item is locked
+        if (PAbstractItem.getLock(e.getCurrentItem())) e.setCancelled(true);
+        if (e.getAction() == InventoryAction.HOTBAR_SWAP) {
+            if (PAbstractItem.getLock(e.getWhoClicked().getInventory().getItemInOffHand())) e.setCancelled(true);
+        }
+        // If the event is cancelled, no PlayerItemDropEvent will fire, so we should block left click event here
+        if (e.getAction() == InventoryAction.DROP_ALL_SLOT || e.getAction() == InventoryAction.DROP_ONE_SLOT) {
+            if (e.isCancelled()) dropBlockUUIDSet.add(e.getWhoClicked().getUniqueId());
+        }
+    }
+
+    @EventHandler
+    public void onSwap(PlayerSwapHandItemsEvent e) {
+        // Block action if one of the two items is locked
+        if (PAbstractItem.getLock(e.getMainHandItem())) e.setCancelled(true);
+        if (PAbstractItem.getLock(e.getOffHandItem())) e.setCancelled(true);
+        if (triggerEvent(e.getPlayer(), PTriggerType.SWAP)) e.setCancelled(true);
+    }
+
+    @EventHandler
     public void onInteract(PlayerInteractEvent e) {
         if (e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK) {
-            if (dropBlockUUIDSet.contains(e.getPlayer().getUniqueId())) {
-                dropBlockUUIDSet.remove(e.getPlayer().getUniqueId());
-                return;
-            }
-            e.setCancelled(triggerEvent(e.getPlayer(), PTriggerType.LEFT));
+            if (triggerEvent(e.getPlayer(), PTriggerType.LEFT)) e.setCancelled(true);
         }
         if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            e.setCancelled(triggerEvent(e.getPlayer(), PTriggerType.RIGHT));
+            if (triggerEvent(e.getPlayer(), PTriggerType.RIGHT)) e.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onHit(EntityDamageByEntityEvent e) {
         if (e.getDamager() instanceof Player) {
-            e.setCancelled(triggerEvent((Player) e.getDamager(), PTriggerType.LEFT));
+            if (triggerEvent((Player) e.getDamager(), PTriggerType.LEFT)) e.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onPlace(BlockPlaceEvent e) {
-        e.setCancelled(triggerEvent(e.getPlayer(), PTriggerType.RIGHT));
+        if (triggerEvent(e.getPlayer(), PTriggerType.RIGHT)) e.setCancelled(true);
     }
 
     @EventHandler
     public void onBreak(BlockBreakEvent e) {
-        e.setCancelled(triggerEvent(e.getPlayer(), PTriggerType.LEFT));
+        if (triggerEvent(e.getPlayer(), PTriggerType.LEFT)) e.setCancelled(true);
     }
 
     @EventHandler
     public void onInteractEntity(PlayerInteractEntityEvent e) {
-        e.setCancelled(triggerEvent(e.getPlayer(), PTriggerType.RIGHT));
-    }
-
-    @EventHandler
-    public void onSwap(PlayerSwapHandItemsEvent e) {
-        e.setCancelled(triggerEvent(e.getPlayer(), PTriggerType.SWAP));
+        if (triggerEvent(e.getPlayer(), PTriggerType.RIGHT)) e.setCancelled(true);
     }
 
     @EventHandler
@@ -88,9 +113,8 @@ public class PTriggerListener implements org.bukkit.event.Listener {
     }
 
     @EventHandler
-    public void onDrop(PlayerDropItemEvent e) {
-        triggerEvent(e.getPlayer(), PTriggerType.DROP);
-        dropBlockUUIDSet.add(e.getPlayer().getUniqueId());
+    public void onSprint(PlayerToggleSprintEvent e) {
+        toggleEvent(e.getPlayer(), PTriggerType.SPRINT, e.getPlayer().isSprinting());
     }
 
     public boolean toggleEvent(Player p, PTriggerType pTT, boolean previousState) {
@@ -99,9 +123,12 @@ public class PTriggerListener implements org.bukkit.event.Listener {
             new PTask() {
                 @Override
                 public void init() {
-                    PTrigger.trigger(p, pTT, PTriggerSubType.INIT);
+                    if (!previousState) {
+                        PTrigger.trigger(p, pTT, PTriggerSubType.INIT);
+                    } else {
+                        PTrigger.trigger(p, pTT, PTriggerSubType.GOAL);
+                    }
                 }
-
                 @Override
                 public void hold() {
                 }
@@ -129,7 +156,9 @@ public class PTriggerListener implements org.bukkit.event.Listener {
 
                 @Override
                 public void goal() {
-                    PTrigger.trigger(p, pTT, PTriggerSubType.GOAL);
+                    if (this.lifeTime <= 0L) {
+                        PTrigger.trigger(p, pTT, PTriggerSubType.GOAL);
+                    }
                     pTaskMap.remove(key);
                 }
             }.runPTask());
@@ -147,6 +176,13 @@ public class PTriggerListener implements org.bukkit.event.Listener {
             new PTask() {
                 @Override
                 public void init() {
+                    if (pTT == PTriggerType.LEFT) {
+                        if (dropBlockUUIDSet.contains(p.getUniqueId())) {
+                            dropBlockUUIDSet.remove(p.getUniqueId());
+                            this.stop();
+                            return;
+                        }
+                    }
                     PTrigger.trigger(p, pTT, PTriggerSubType.INIT);
                 }
 
@@ -166,6 +202,13 @@ public class PTriggerListener implements org.bukkit.event.Listener {
             pTaskMap.put(key, new PTask() {
                 @Override
                 public void init() {
+                    if (pTT == PTriggerType.LEFT) {
+                        if (dropBlockUUIDSet.contains(p.getUniqueId())) {
+                            dropBlockUUIDSet.remove(p.getUniqueId());
+                            this.stop();
+                            return;
+                        }
+                    }
                     PTrigger.trigger(p, pTT, PTriggerSubType.INIT);
                 }
 
@@ -176,7 +219,9 @@ public class PTriggerListener implements org.bukkit.event.Listener {
 
                 @Override
                 public void goal() {
-                    PTrigger.trigger(p, pTT, PTriggerSubType.GOAL);
+                    if (this.lifeTime <= 0L) {
+                        PTrigger.trigger(p, pTT, PTriggerSubType.GOAL);
+                    }
                     pTaskMap.remove(key);
                 }
             }.runPTask(pTT.holdDetectDelay));

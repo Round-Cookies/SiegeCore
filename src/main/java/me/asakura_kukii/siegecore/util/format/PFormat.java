@@ -49,7 +49,6 @@ public class PFormat {
             assert pT != null;
             String[] subStringList = s.split("\\$");
             subStringList[0] = "";
-            SiegeCore.error(Arrays.toString(subStringList));
             for (String subString : subStringList) {
                 if (subString.length() == 0) continue;
                 for (PFile pF : pT.getPFileList()) {
