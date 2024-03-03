@@ -44,6 +44,11 @@ public class PSender {
         return sender instanceof Player;
     }
 
+    public Player getPlayer() {
+        if (isPlayer()) return (Player) sender;
+        return null;
+    }
+
     public boolean hasPerm(String s) {
         if (!isPlayer()) return true;
         return sender.hasPermission(pluginName + "." + s);

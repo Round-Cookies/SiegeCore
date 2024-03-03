@@ -87,7 +87,7 @@ public class PCommandItem {
 
     public static void listItem(PSender sender, PType pT) {
         List<PFile> pFileList = pT.getPFileList();
-        if (pFileList.size() == 0) {
+        if (pFileList.isEmpty()) {
             sender.log("no item");
         } else if (pFileList.size() == 1) {
             sender.log(pFileList.size() + " item listed:");

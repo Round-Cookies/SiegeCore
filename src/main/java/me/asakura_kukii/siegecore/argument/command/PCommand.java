@@ -1,5 +1,6 @@
 package me.asakura_kukii.siegecore.argument.command;
 
+import me.asakura_kukii.siegecore.SiegeCore;
 import me.asakura_kukii.siegecore.io.PType;
 import me.asakura_kukii.siegecore.argument.PArgument;
 import me.asakura_kukii.siegecore.argument.PSender;
@@ -19,7 +20,7 @@ public class PCommand {
 
         switch (s) {
             case "info":
-                return onInfo(sender, argument);
+                return onInfo(sender);
             case "item":
                 if (!sender.hasPerm("item")) {
                     sender.error("Missing permission");
@@ -54,13 +55,17 @@ public class PCommand {
                 PType.saveAll();
                 PType.loadAll();
                 return true;
+            case "debug":
+                SiegeCore.debug = !SiegeCore.debug;
+                sender.info("Debug mode switched");
+                return true;
             default:
                 sender.error("Invalid sub-argument");
                 return false;
         }
     }
 
-    public static boolean onInfo(PSender sender, PArgument argument) {
+    public static boolean onInfo(PSender sender) {
         sender.info("Standby!");
         return true;
     }

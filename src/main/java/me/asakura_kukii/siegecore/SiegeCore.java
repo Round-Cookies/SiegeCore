@@ -6,11 +6,8 @@ import me.asakura_kukii.siegecore.io.PType;
 import me.asakura_kukii.siegecore.io.PTypeListener;
 import me.asakura_kukii.siegecore.item.PItem;
 import me.asakura_kukii.siegecore.player.PPlayer;
-import me.asakura_kukii.siegecore.stringanim.PStringAnim;
 import me.asakura_kukii.siegecore.trigger.PTrigger;
 import me.asakura_kukii.siegecore.trigger.PTriggerListener;
-import me.asakura_kukii.siegecore.trigger.PTriggerSubType;
-import me.asakura_kukii.siegecore.trigger.PTriggerType;
 import me.asakura_kukii.siegecore.unicode.PUnicode;
 import me.asakura_kukii.siegecore.argument.PArgument;
 import me.asakura_kukii.siegecore.argument.PSender;
@@ -21,19 +18,21 @@ import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class SiegeCore extends JavaPlugin {
+    public static boolean flagEnabled = false;
+    public static UUID sessionUUID = UUID.randomUUID();
     public static String pluginColorCode = "&c";
-
     public static Server server = null;
     public static String pluginName;
     public static String pluginPrefix;
@@ -41,6 +40,7 @@ public class SiegeCore extends JavaPlugin {
     public static JavaPlugin pluginInstance = null;
     public static File pluginFolder = null;
     public static long runTickTime = 0L;
+    public static boolean debug = false;
     public static HashMap<JavaPlugin, BukkitTask> updaterRegister = new HashMap<>();
 
     public static void registerEvent() {
@@ -49,11 +49,10 @@ public class SiegeCore extends JavaPlugin {
     }
 
     public static void registerType() {
+        PType.putPType(pluginInstance, "unicode", PUnicode.class);
         PType.putPType(pluginInstance, "particle", PParticle.class);
         PType.putPType(pluginInstance, "sound", PSound.class);
         PType.putPType(pluginInstance, "item", PItem.class);
-        PType.putPType(pluginInstance, "unicode", PUnicode.class);
-        PType.putPType(pluginInstance, "stringanim", PStringAnim.class);
         PType.putPType(pluginInstance, "player", PPlayer.class);
     }
 
@@ -73,7 +72,8 @@ public class SiegeCore extends JavaPlugin {
 
         updater();
         info(pluginName + " enabled");
-
+        flagEnabled = true;
+        sessionUUID = UUID.randomUUID();
         server.getScheduler().scheduleSyncDelayedTask(this, () -> {
             info("Loading all types...");
             PType.loadAll();
@@ -81,6 +81,9 @@ public class SiegeCore extends JavaPlugin {
     }
 
     public void onDisable() {
+        PType.savePlayerData();
+        PType.unloadAll();
+        flagEnabled = false;
         info("Disabling " + pluginName);
         info(pluginName + " disabled");
     }
@@ -99,46 +102,45 @@ public class SiegeCore extends JavaPlugin {
         }.runTaskTimer(pluginInstance , 0, 1));
     }
 
-    public static void info(String s) {
-        String[] msgList = s.split("\n");
-        for (String msg : msgList) {
-            if (msg.trim().length() >= 200) {
-                raw(PFormat.ANSI_GREEN + consolePluginPrefix + msg.trim().substring(0, 199) + "..." + PFormat.ANSI_WHITE);
-            } else {
-                raw(PFormat.ANSI_GREEN + consolePluginPrefix + msg.trim() + PFormat.ANSI_WHITE);
-            }
-        }
+    public static void info(String rawText) {
+        info(consolePluginPrefix, rawText);
     }
 
-    public static void log(String s) {
-        String[] msgList = s.split("\n");
-        for (String msg : msgList) {
-            if (msg.trim().length() >= 200) {
-                raw(PFormat.ANSI_WHITE + consolePluginPrefix + msg.trim().substring(0, 199) + "..." + PFormat.ANSI_WHITE);
-            } else {
-                raw(PFormat.ANSI_WHITE + consolePluginPrefix + msg.trim() + PFormat.ANSI_WHITE);
-            }
-        }
+    public static void info(String prefix, String rawText) {
+        msg(PFormat.ANSI_GREEN, prefix, rawText);
     }
 
-    public static void warn(String s) {
-        String[] msgList = s.split("\n");
-        for (String msg : msgList) {
-            if (msg.trim().length() >= 200) {
-                raw(PFormat.ANSI_YELLOW + consolePluginPrefix + msg.trim().substring(0, 199) + "..." + PFormat.ANSI_WHITE);
-            } else {
-                raw(PFormat.ANSI_YELLOW + consolePluginPrefix + msg.trim() + PFormat.ANSI_WHITE);
-            }
-        }
+    public static void log(String rawText) {
+        log(consolePluginPrefix, rawText);
     }
 
-    public static void error(String s) {
-        String[] msgList = s.split("\n");
-        for (String msg : msgList) {
-            if (msg.trim().length() >= 200) {
-                raw(PFormat.ANSI_RED + consolePluginPrefix + msg.trim().substring(0, 199) + "..." + PFormat.ANSI_WHITE);
+    public static void log(String prefix, String rawText) {
+        msg(PFormat.ANSI_WHITE, prefix, rawText);
+    }
+
+    public static void warn(String rawText) {
+        warn(consolePluginPrefix, rawText);
+    }
+
+    public static void warn(String prefix, String rawText) {
+        msg(PFormat.ANSI_YELLOW, prefix, rawText);
+    }
+
+    public static void error(String rawText) {
+        error(consolePluginPrefix, rawText);
+    }
+
+    public static void error(String prefix, String rawText) {
+        msg(PFormat.ANSI_RED, prefix, rawText);
+    }
+
+    public static void msg(String color, String prefix, String rawText) {
+        String[] textList = rawText.split("\n");
+        for (String text : textList) {
+            if (text.trim().length() >= 200) {
+                raw(color + prefix + text.trim().substring(0, 199) + "..." + PFormat.ANSI_WHITE);
             } else {
-                raw(PFormat.ANSI_RED + consolePluginPrefix + msg.trim() + PFormat.ANSI_WHITE);
+                raw(color + prefix + text.trim() + PFormat.ANSI_WHITE);
             }
         }
     }
@@ -148,7 +150,7 @@ public class SiegeCore extends JavaPlugin {
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender commandSender, Command command, String label, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, String[] args) {
         List<String> sL = new ArrayList<>();
         if (args.length > 0) {
             PArgument argument = new PArgument(label, args);
@@ -160,7 +162,7 @@ public class SiegeCore extends JavaPlugin {
     }
 
     @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender commandSender, Command command, @NotNull String label, String[] args) {
         if (command.getName().equalsIgnoreCase(pluginName)) {
             PArgument argument = new PArgument(label, args);
             PSender sender = new PSender(pluginName, pluginPrefix, commandSender);

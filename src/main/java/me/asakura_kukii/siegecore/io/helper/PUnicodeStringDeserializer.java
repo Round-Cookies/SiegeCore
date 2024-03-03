@@ -1,4 +1,4 @@
-package me.asakura_kukii.siegecore.unicode;
+package me.asakura_kukii.siegecore.io.helper;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;

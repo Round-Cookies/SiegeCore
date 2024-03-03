@@ -1,5 +1,6 @@
 package me.asakura_kukii.siegecore.trigger;
 
+import me.asakura_kukii.siegecore.SiegeCore;
 import me.asakura_kukii.siegecore.io.PFile;
 import me.asakura_kukii.siegecore.io.PType;
 import me.asakura_kukii.siegecore.item.PAbstractItem;
@@ -28,20 +29,38 @@ public class PTrigger {
         return false;
     }
 
-    public static void trigger(Player p, PTriggerType pTT, PTriggerSubType pTST) {
-        PAbstractItem.checkTrigger(p, pTT, pTST, PTriggerSlot.MAIN, p.getInventory().getItemInMainHand());
-        PAbstractItem.checkTrigger(p, pTT, pTST, PTriggerSlot.OFF, p.getInventory().getItemInOffHand());
-        PAbstractItem.checkTrigger(p, pTT, pTST, PTriggerSlot.HEAD, p.getInventory().getHelmet());
-        PAbstractItem.checkTrigger(p, pTT, pTST, PTriggerSlot.CHEST, p.getInventory().getChestplate());
-        PAbstractItem.checkTrigger(p, pTT, pTST, PTriggerSlot.LEGS, p.getInventory().getLeggings());
-        PAbstractItem.checkTrigger(p, pTT, pTST, PTriggerSlot.FEET, p.getInventory().getBoots());
+    public static void trigger(Player p, PTriggerType pTT, PTriggerSubType pTST, long triggerTickTime) {
+        PType pT = PType.getPType(PPlayer.class);
+        if (pT == null) return;
+        PPlayer pP = (PPlayer) pT.getPFileSafely(p.getUniqueId().toString());
+        if (pP == null) return;
+        // due to the priority of bukkit tasks, some modifications must be made
+        long mainHoldTickTime = SiegeCore.runTickTime - Math.max(pP.getEquipmentTickTime(PTriggerSlot.MAIN), triggerTickTime) - 1;
+        if (mainHoldTickTime < 0) mainHoldTickTime = 0;
+        long offHoldTickTime = SiegeCore.runTickTime - Math.max(pP.getEquipmentTickTime(PTriggerSlot.OFF), triggerTickTime) - 1;
+        if (offHoldTickTime < 0) offHoldTickTime = 0;
+        PAbstractItem.checkTrigger(p, pTT, pTST, PTriggerSlot.MAIN, p.getInventory().getItemInMainHand(), mainHoldTickTime);
+        PAbstractItem.checkTrigger(p, pTT, pTST, PTriggerSlot.OFF, p.getInventory().getItemInOffHand(), offHoldTickTime);
+
+        long headHoldTickTime = SiegeCore.runTickTime - Math.max(pP.getEquipmentTickTime(PTriggerSlot.HEAD), triggerTickTime) - 1;
+        if (headHoldTickTime < 0) headHoldTickTime = 0;
+        long chestHoldTickTime = SiegeCore.runTickTime - Math.max(pP.getEquipmentTickTime(PTriggerSlot.CHEST), triggerTickTime) - 1;
+        if (chestHoldTickTime < 0) chestHoldTickTime = 0;
+        long legsHoldTickTime = SiegeCore.runTickTime - Math.max(pP.getEquipmentTickTime(PTriggerSlot.LEGS), triggerTickTime) - 1;
+        if (legsHoldTickTime < 0) legsHoldTickTime = 0;
+        long feetHoldTickTime = SiegeCore.runTickTime - Math.max(pP.getEquipmentTickTime(PTriggerSlot.FEET), triggerTickTime) - 1;
+        if (feetHoldTickTime < 0) feetHoldTickTime = 0;
+        PAbstractItem.checkTrigger(p, pTT, pTST, PTriggerSlot.HEAD, p.getInventory().getHelmet(), headHoldTickTime);
+        PAbstractItem.checkTrigger(p, pTT, pTST, PTriggerSlot.CHEST, p.getInventory().getChestplate(), chestHoldTickTime);
+        PAbstractItem.checkTrigger(p, pTT, pTST, PTriggerSlot.LEGS, p.getInventory().getLeggings(), legsHoldTickTime);
+        PAbstractItem.checkTrigger(p, pTT, pTST, PTriggerSlot.FEET, p.getInventory().getBoots(), feetHoldTickTime);
     }
 
     public static void update() {
         PType pT = PType.getPType(PPlayer.class);
         if (pT == null) return;
         for (Player p : Bukkit.getOnlinePlayers()) {
-            PPlayer pP = (PPlayer) pT.getPFile(p.getName());
+            PPlayer pP = (PPlayer) pT.getPFileSafely(p.getUniqueId().toString());
             if (pP == null) continue;
             Pair<HashMap<PTriggerSlot, Pair<String, ItemStack>>, HashMap<PTriggerSlot, Pair<String, ItemStack>>> iSP = pP.updateEquipmentList();
             HashMap<PTriggerSlot, Pair<String, ItemStack>> stockItemStackMap = iSP.getLeft();
@@ -51,13 +70,14 @@ public class PTrigger {
                 if (iS == null || iS.getType() == Material.AIR) {
                     iS = recoverItemStack(p, stockItemStackMap.get(slot).getLeft());
                 }
-                if (iS != null) PAbstractItem.checkTrigger(p, PTriggerType.STOCK, PTriggerSubType.INIT, slot, iS);
+                if (iS != null) PAbstractItem.checkTrigger(p, PTriggerType.STOCK, PTriggerSubType.INIT, slot, iS, 0);
+                // special trigger toggle block
+                if (iS != null && iS.getType().equals(Material.SHIELD)) PTriggerListener.toggleEvent(p, PTriggerType.BLOCK, true);
             }
             for (PTriggerSlot slot : equipItemStackMap.keySet()) {
                 ItemStack iS = equipItemStackMap.get(slot).getRight();
-                if (iS != null) PAbstractItem.checkTrigger(p, PTriggerType.EQUIP, PTriggerSubType.INIT, slot, equipItemStackMap.get(slot).getRight());
+                if (iS != null) PAbstractItem.checkTrigger(p, PTriggerType.EQUIP, PTriggerSubType.INIT, slot, equipItemStackMap.get(slot).getRight(), 0);
             }
-            //PTrigger.trigger(p, PTriggerType.TICK, PTriggerSubType.HOLD);
         }
     }
 

@@ -3,8 +3,10 @@ package me.asakura_kukii.siegecore.util.math;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
+import org.joml.Math;
 import org.joml.Vector3f;
 
 public class PVector extends Vector3f {
@@ -27,6 +29,21 @@ public class PVector extends Vector3f {
     }
 
     @JsonIgnore
+    public PQuaternion rotationToExceptZ(PVector to) {
+        if (this.length() == 0 || to.length() == 0) return null;
+        PQuaternion rotation = (PQuaternion) this.clone().normalize().rotationTo(to.clone().normalize(), new PQuaternion());
+        Vector3f eulerAngle = rotation.getEulerAnglesYXZ(new PVector());
+        if (eulerAngle.y > PMath.pi) eulerAngle.y = eulerAngle.y - 2 * PMath.pi;
+        if (eulerAngle.y < -PMath.pi) eulerAngle.y = eulerAngle.y + 2 * PMath.pi;
+        return (PQuaternion) new PQuaternion().rotateLocalY(eulerAngle.y).rotateX(eulerAngle.x);
+    }
+
+    @JsonIgnore
+    public int[] getIntArray() {
+        return new int[] {(int) x, (int) y, (int) z};
+    }
+
+    @JsonIgnore
     public Location getLocation(LivingEntity lE) {
         return getLocation(lE.getWorld());
     }
@@ -39,6 +56,11 @@ public class PVector extends Vector3f {
     @JsonIgnore
     public Vector getVector() {
         return new Vector(x, y, z);
+    }
+
+    public static PVector fromIntArray(int[] i) {
+        if (i.length != 3) return null;
+        return new PVector(i[0], i[1], i[2]);
     }
 
     public static PVector fromLocation(Location l) {
@@ -58,6 +80,22 @@ public class PVector extends Vector3f {
                 radius * PMath.cos(theta),
                 radius * PMath.sin(theta) * PMath.sin(phi)
         );
+    }
+
+    public BlockFace getBlockFace() {
+        if (Math.abs(x) > Math.abs(y)) {
+            if (Math.abs(x) > Math.abs(z)) {
+                return x > 0 ? BlockFace.EAST : BlockFace.WEST;
+            } else {
+                return z > 0 ? BlockFace.SOUTH : BlockFace.NORTH;
+            }
+        } else {
+            if (Math.abs(y) > Math.abs(z)) {
+                return y > 0 ? BlockFace.UP : BlockFace.DOWN;
+            } else {
+                return z > 0 ? BlockFace.SOUTH : BlockFace.NORTH;
+            }
+        }
     }
 
     public int r() {

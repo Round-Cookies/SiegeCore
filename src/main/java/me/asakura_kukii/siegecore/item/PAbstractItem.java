@@ -34,7 +34,9 @@ public abstract class PAbstractItem extends PFile {
     public List<String> lore = new ArrayList<>();
     public Set<PTriggerType> triggerCancelSet = new HashSet<>();
     public Set<PTriggerSlot> triggerSlotSet = new HashSet<>();
+    public float price = 0.0F;
     public boolean lock = false;
+    public boolean unique = false;
 
     @JsonIgnore
     public static NamespacedKey typeKey = new NamespacedKey(SiegeCore.pluginInstance, "type");
@@ -48,8 +50,10 @@ public abstract class PAbstractItem extends PFile {
     @JsonIgnore
     public static NamespacedKey lockKey = new NamespacedKey(SiegeCore.pluginInstance, "lock");
 
+    @JsonIgnore
+    public static NamespacedKey nullKey = new NamespacedKey(SiegeCore.pluginInstance, "null");
 
-    public abstract void trigger(Player p, PTriggerType pTT, PTriggerSubType pTST, PTriggerSlot pTS, ItemStack iS);
+    public abstract void trigger(Player p, PTriggerType pTT, PTriggerSubType pTST, PTriggerSlot pTS, ItemStack iS, long hTT);
 
     public abstract ItemStack finalizeGetItemStack(ItemStack iS);
 
@@ -72,8 +76,9 @@ public abstract class PAbstractItem extends PFile {
         PersistentDataContainer pDC = iM.getPersistentDataContainer();
         pDC.set(typeKey, PersistentDataType.STRING, type.id);
         pDC.set(idKey, PersistentDataType.STRING, id);
-        pDC.set(uuidKey, PersistentDataType.STRING, UUID.randomUUID().toString());
+        if (unique) pDC.set(uuidKey, PersistentDataType.STRING, UUID.randomUUID().toString());
         pDC.set(lockKey, PersistentDataType.BOOLEAN, lock);
+        pDC.set(nullKey, PersistentDataType.BOOLEAN, true);
         iM.setDisplayName(PFormat.format(name));
         iM.setCustomModelData(customModelData);
         iM.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
@@ -93,10 +98,10 @@ public abstract class PAbstractItem extends PFile {
         PersistentDataContainer pDC = iM.getPersistentDataContainer();
         PType pT = PType.getPType(pDC.get(typeKey, PersistentDataType.STRING));
         String id = pDC.get(idKey, PersistentDataType.STRING);
-        String uuidString = pDC.get(uuidKey, PersistentDataType.STRING);
-        if (pT == null || !pT.isItem || id == null || uuidString == null) {
+        if (pT == null || !pT.isItem || id == null) {
             return null;
         }
+        if (!(pT.getPFile(id) instanceof PAbstractItem)) return null;
         return (PAbstractItem) pT.getPFile(id);
     }
 
@@ -115,9 +120,24 @@ public abstract class PAbstractItem extends PFile {
         if (iS.getItemMeta() == null) return false;
         ItemMeta iM = iS.getItemMeta();
         PersistentDataContainer pDC = iM.getPersistentDataContainer();
-        Boolean lock = pDC.get(lockKey, PersistentDataType.BOOLEAN);
-        if (lock == null) return false;
-        return lock;
+        Boolean flagLock = pDC.get(lockKey, PersistentDataType.BOOLEAN);
+        if (flagLock == null) return false;
+        return flagLock;
+    }
+
+    @JsonIgnore
+    public static void triggerRiseAnimation(ItemStack iS) {
+        if (iS == null) return;
+        if (iS.getItemMeta() == null) return;
+        ItemMeta iM = iS.getItemMeta();
+        PersistentDataContainer pDC = iM.getPersistentDataContainer();
+        Boolean flagNull = pDC.get(nullKey, PersistentDataType.BOOLEAN);
+        if (flagNull == null || flagNull) {
+            pDC.set(nullKey, PersistentDataType.BOOLEAN, false);
+        } else {
+            pDC.set(nullKey, PersistentDataType.BOOLEAN, true);
+        }
+        iS.setItemMeta(iM);
     }
 
     @JsonIgnore
@@ -127,10 +147,11 @@ public abstract class PAbstractItem extends PFile {
         return pAI.triggerCancelSet.contains(pTT) && pAI.triggerSlotSet.contains(pTS);
     }
 
-    public static void checkTrigger(Player p, PTriggerType pTT, PTriggerSubType pTST, PTriggerSlot pTS, ItemStack iS) {
+    public static void checkTrigger(Player p, PTriggerType pTT, PTriggerSubType pTST, PTriggerSlot pTS, ItemStack iS, long hTT) {
         PAbstractItem pAI = getPItem(iS);
         if (pAI == null) return;
         if (!pAI.triggerSlotSet.contains(pTS)) return;
-        pAI.trigger(p, pTT, pTST, pTS, iS);
+        if (SiegeCore.debug) p.sendMessage(pAI.id + " " + pTT.name() + " " + pTST.name() + " " + pTS.name() + " " + hTT + " " + SiegeCore.runTickTime);
+        pAI.trigger(p, pTT, pTST, pTS, iS, hTT);
     }
 }

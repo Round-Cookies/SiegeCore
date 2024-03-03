@@ -41,7 +41,7 @@ public class PCommandFile {
 
     public static void listFile(PSender sender, PType pT) {
         List<PFile> pFileList = pT.getPFileList();
-        if (pFileList.size() == 0) {
+        if (pFileList.isEmpty()) {
             sender.log("No file");
         } else if (pFileList.size() == 1) {
             sender.log(pFileList.size() + " file listed:");

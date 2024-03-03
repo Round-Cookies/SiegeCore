@@ -1,4 +1,4 @@
-package me.asakura_kukii.siegecore.util.math;
+package me.asakura_kukii.siegecore.io.helper;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.KeyDeserializer;
 import me.asakura_kukii.siegecore.io.PFile;
 import me.asakura_kukii.siegecore.io.PType;
+import me.asakura_kukii.siegecore.util.math.PVector;
 
 import java.io.IOException;
 import java.util.ArrayList;

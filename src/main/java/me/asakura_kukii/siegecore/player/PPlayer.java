@@ -5,14 +5,9 @@ import me.asakura_kukii.siegecore.SiegeCore;
 import me.asakura_kukii.siegecore.io.PType;
 import me.asakura_kukii.siegecore.item.PAbstractItem;
 import me.asakura_kukii.siegecore.trigger.PTriggerSlot;
-import me.asakura_kukii.siegecore.util.math.PMath;
 import org.apache.commons.lang3.tuple.Pair;
-import org.bukkit.Bukkit;
-import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
-import org.joml.Vector3f;
 
 import java.io.File;
 import java.util.*;
@@ -29,45 +24,58 @@ public class PPlayer extends PAbstractPlayer{
     public static final PTriggerSlot[] slotList = {PTriggerSlot.MAIN, PTriggerSlot.OFF, PTriggerSlot.HEAD, PTriggerSlot.CHEST, PTriggerSlot.LEGS, PTriggerSlot.FEET};
 
     @JsonIgnore
-    public List<String> equipmentUUIDList = new ArrayList<>(Arrays.asList(null, null, null, null, null, null));
+    public HashMap<PTriggerSlot, String> equipmentUUIDMap = new HashMap<>();
 
     @JsonIgnore
-    public List<ItemStack> equipmentItemStackList = new ArrayList<>(Arrays.asList(null, null, null, null, null, null));
+    public HashMap<PTriggerSlot, ItemStack> equipmentItemStackMap = new HashMap<>();
+
+    @JsonIgnore
+    public HashMap<PTriggerSlot, Long> equipmentTickTimeList = new HashMap<>();
+
+    @JsonIgnore
+    public long getEquipmentTickTime(PTriggerSlot pTS) {
+        if (!equipmentTickTimeList.containsKey(pTS)) return SiegeCore.runTickTime;
+        if (equipmentTickTimeList.get(pTS) == null) return SiegeCore.runTickTime;
+        // modifications due to bukkit task order
+        return equipmentTickTimeList.get(pTS) - 2;
+    }
 
     @JsonIgnore
     public Pair<HashMap<PTriggerSlot, Pair<String, ItemStack>>, HashMap<PTriggerSlot, Pair<String, ItemStack>>> updateEquipmentList() {
-        Player p = Bukkit.getPlayer(id);
-        List<String> equipmentUUIDList = new ArrayList<>(Arrays.asList(null, null, null, null, null, null));
-        List<ItemStack> equipmentItemStackList = new ArrayList<>(Arrays.asList(null, null, null, null, null, null));
+        Player p = getPlayer();
         if (p == null) return null;
+        HashMap<PTriggerSlot, ItemStack> equipmentItemStackMap = new HashMap<>();
+        HashMap<PTriggerSlot, String> equipmentUUIDMap = new HashMap<>();
         HashMap<PTriggerSlot, Pair<String, ItemStack>> stockItemStackMap = new HashMap<>();
         HashMap<PTriggerSlot, Pair<String, ItemStack>> equipItemStackMap = new HashMap<>();
-        equipmentUUIDList.set(0, PAbstractItem.getUUID(p.getInventory().getItemInMainHand()));
-        equipmentUUIDList.set(1, PAbstractItem.getUUID(p.getInventory().getItemInOffHand()));
-        equipmentUUIDList.set(2, PAbstractItem.getUUID(p.getInventory().getHelmet()));
-        equipmentUUIDList.set(3, PAbstractItem.getUUID(p.getInventory().getChestplate()));
-        equipmentUUIDList.set(4, PAbstractItem.getUUID(p.getInventory().getLeggings()));
-        equipmentUUIDList.set(5, PAbstractItem.getUUID(p.getInventory().getBoots()));
-        if (p.getInventory().getItemInMainHand() != null) equipmentItemStackList.set(0, p.getInventory().getItemInMainHand());
-        if (p.getInventory().getItemInOffHand() != null) equipmentItemStackList.set(1, p.getInventory().getItemInOffHand());
-        if (p.getInventory().getHelmet() != null) equipmentItemStackList.set(2, p.getInventory().getHelmet());
-        if (p.getInventory().getChestplate() != null) equipmentItemStackList.set(3, p.getInventory().getChestplate());
-        if (p.getInventory().getLeggings() != null) equipmentItemStackList.set(4, p.getInventory().getLeggings());
-        if (p.getInventory().getBoots() != null) equipmentItemStackList.set(5, p.getInventory().getBoots());
-        for (int i = 0; i < 6; i++) {
-            if (!(Objects.equals(this.equipmentUUIDList.get(i), equipmentUUIDList.get(i)))) {
-                if (this.equipmentUUIDList.get(i) != null) {
-                    stockItemStackMap.put(slotList[i], Pair.of(this.equipmentUUIDList.get(i), this.equipmentItemStackList.get(i)));
+        equipmentUUIDMap.put(PTriggerSlot.MAIN, PAbstractItem.getUUID(p.getInventory().getItemInMainHand()));
+        equipmentUUIDMap.put(PTriggerSlot.OFF, PAbstractItem.getUUID(p.getInventory().getItemInOffHand()));
+        equipmentUUIDMap.put(PTriggerSlot.HEAD, PAbstractItem.getUUID(p.getInventory().getHelmet()));
+        equipmentUUIDMap.put(PTriggerSlot.CHEST, PAbstractItem.getUUID(p.getInventory().getChestplate()));
+        equipmentUUIDMap.put(PTriggerSlot.LEGS, PAbstractItem.getUUID(p.getInventory().getLeggings()));
+        equipmentUUIDMap.put(PTriggerSlot.FEET, PAbstractItem.getUUID(p.getInventory().getBoots()));
+        if (p.getInventory().getItemInMainHand() != null) equipmentItemStackMap.put(PTriggerSlot.MAIN, p.getInventory().getItemInMainHand());
+        if (p.getInventory().getItemInOffHand() != null) equipmentItemStackMap.put(PTriggerSlot.OFF, p.getInventory().getItemInOffHand());
+        if (p.getInventory().getHelmet() != null) equipmentItemStackMap.put(PTriggerSlot.HEAD, p.getInventory().getHelmet());
+        if (p.getInventory().getChestplate() != null) equipmentItemStackMap.put(PTriggerSlot.CHEST, p.getInventory().getChestplate());
+        if (p.getInventory().getLeggings() != null) equipmentItemStackMap.put(PTriggerSlot.LEGS, p.getInventory().getLeggings());
+        if (p.getInventory().getBoots() != null) equipmentItemStackMap.put(PTriggerSlot.FEET, p.getInventory().getBoots());
+        for (PTriggerSlot pTS : slotList) {
+            if (!(Objects.equals(this.equipmentUUIDMap.get(pTS), equipmentUUIDMap.get(pTS)))) {
+                if (this.equipmentUUIDMap.get(pTS) != null) {
+                    stockItemStackMap.put(pTS, Pair.of(this.equipmentUUIDMap.get(pTS), this.equipmentItemStackMap.get(pTS)));
+                    this.equipmentTickTimeList.put(pTS, null);
                 }
-                if (equipmentUUIDList.get(i) != null) {
-                    equipItemStackMap.put(slotList[i], Pair.of(equipmentUUIDList.get(i), equipmentItemStackList.get(i)));
+                if (equipmentUUIDMap.get(pTS) != null) {
+                    equipItemStackMap.put(pTS, Pair.of(equipmentUUIDMap.get(pTS), equipmentItemStackMap.get(pTS)));
+                    this.equipmentTickTimeList.put(pTS, SiegeCore.runTickTime);
                 }
             }
         }
-        this.equipmentUUIDList.clear();
-        this.equipmentUUIDList.addAll(equipmentUUIDList);
-        this.equipmentItemStackList.clear();
-        this.equipmentItemStackList.addAll(equipmentItemStackList);
+        this.equipmentUUIDMap.clear();
+        this.equipmentUUIDMap.putAll(equipmentUUIDMap);
+        this.equipmentItemStackMap.clear();
+        this.equipmentItemStackMap.putAll(equipmentItemStackMap);
         return Pair.of(stockItemStackMap, equipItemStackMap);
     }
 
@@ -78,6 +86,16 @@ public class PPlayer extends PAbstractPlayer{
 
     @Override
     public void defaultValue() {
+
+    }
+
+    @Override
+    public void load() {
+
+    }
+
+    @Override
+    public void unload() {
 
     }
 }

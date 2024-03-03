@@ -31,22 +31,11 @@ public abstract class PFile {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
     }
 
-    public abstract void finalizeDeserialization();
+    public abstract void finalizeDeserialization() throws IOException;
 
     public abstract void defaultValue();
 
-    public boolean write() {
-        try {
-            FileWriter fileWriter = new FileWriter(this.file);
-            fileWriter.write("");
-            fileWriter.write(this.serialize());
-            fileWriter.flush();
-            fileWriter.close();
-            return true;
-        } catch (IOException e) {
-            SiegeCore.error("Failed when writing [" + this.file.getName() + "]");
-            SiegeCore.error(e.getLocalizedMessage());
-            return false;
-        }
-    }
+    public abstract void load();
+
+    public abstract void unload();
 }

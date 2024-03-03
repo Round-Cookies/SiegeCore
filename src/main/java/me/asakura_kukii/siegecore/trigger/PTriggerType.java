@@ -9,7 +9,9 @@ public enum PTriggerType {
     SPRINT(false, 0L),
     TICK(false, 0L),
     EQUIP(false, 0L),
-    STOCK(false, 0L)
+    STOCK(false, 0L),
+
+    BLOCK(true, 0L)
     ;
 
     public boolean flagHold = false;

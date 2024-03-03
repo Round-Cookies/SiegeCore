@@ -1,9 +1,15 @@
 package me.asakura_kukii.siegecore.trigger;
 
+import io.papermc.paper.event.player.PlayerStopUsingItemEvent;
 import me.asakura_kukii.siegecore.SiegeCore;
 import me.asakura_kukii.siegecore.item.PAbstractItem;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -12,8 +18,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.plugin.RegisteredListener;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,6 +62,8 @@ public class PTriggerListener implements org.bukkit.event.Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
         // Block action if the item is locked
+        if (!(e.getWhoClicked() instanceof Player)) return;
+        Player p = (Player) e.getWhoClicked();
         if (PAbstractItem.getLock(e.getCurrentItem())) e.setCancelled(true);
         if (e.getAction() == InventoryAction.HOTBAR_SWAP) {
             if (PAbstractItem.getLock(e.getWhoClicked().getInventory().getItemInOffHand())) e.setCancelled(true);
@@ -82,6 +89,10 @@ public class PTriggerListener implements org.bukkit.event.Listener {
         }
         if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
             if (triggerEvent(e.getPlayer(), PTriggerType.RIGHT)) e.setCancelled(true);
+            // special trigger toggle block
+            if (e.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.SHIELD) || e.getPlayer().getInventory().getItemInOffHand().getType().equals(Material.SHIELD)) {
+                toggleEvent(e.getPlayer(), PTriggerType.BLOCK, false);
+            }
         }
     }
 
@@ -117,16 +128,22 @@ public class PTriggerListener implements org.bukkit.event.Listener {
         toggleEvent(e.getPlayer(), PTriggerType.SPRINT, e.getPlayer().isSprinting());
     }
 
-    public boolean toggleEvent(Player p, PTriggerType pTT, boolean previousState) {
+    @EventHandler
+    public void onStopUsingItem(PlayerStopUsingItemEvent e) {
+        // special trigger toggle block
+        if (e.getItem().getType().equals(Material.SHIELD)) toggleEvent(e.getPlayer(), PTriggerType.BLOCK, true);
+    }
+
+    public static boolean toggleEvent(Player p, PTriggerType pTT, boolean previousState) {
         String key = p.getUniqueId() + pTT.name();
         if (!pTT.flagHold) {
             new PTask() {
                 @Override
                 public void init() {
                     if (!previousState) {
-                        PTrigger.trigger(p, pTT, PTriggerSubType.INIT);
+                        PTrigger.trigger(p, pTT, PTriggerSubType.INIT, this.triggerTickTime);
                     } else {
-                        PTrigger.trigger(p, pTT, PTriggerSubType.GOAL);
+                        PTrigger.trigger(p, pTT, PTriggerSubType.GOAL, this.triggerTickTime);
                     }
                 }
                 @Override
@@ -146,18 +163,18 @@ public class PTriggerListener implements org.bukkit.event.Listener {
             pTaskMap.put(key, new PTask() {
                 @Override
                 public void init() {
-                    PTrigger.trigger(p, pTT, PTriggerSubType.INIT);
+                    PTrigger.trigger(p, pTT, PTriggerSubType.INIT, this.triggerTickTime);
                 }
 
                 @Override
                 public void hold() {
-                    PTrigger.trigger(p, pTT, PTriggerSubType.HOLD);
+                    PTrigger.trigger(p, pTT, PTriggerSubType.HOLD, this.triggerTickTime);
                 }
 
                 @Override
                 public void goal() {
-                    if (this.lifeTime <= 0L) {
-                        PTrigger.trigger(p, pTT, PTriggerSubType.GOAL);
+                    if (this.lifeTickTime <= 0L) {
+                        PTrigger.trigger(p, pTT, PTriggerSubType.GOAL, this.triggerTickTime);
                     }
                     pTaskMap.remove(key);
                 }
@@ -170,7 +187,7 @@ public class PTriggerListener implements org.bukkit.event.Listener {
         return false;
     }
 
-    public boolean triggerEvent(Player p, PTriggerType pTT) {
+    public static boolean triggerEvent(Player p, PTriggerType pTT) {
         String key = p.getUniqueId() + pTT.name();
         if (!pTT.flagHold) {
             new PTask() {
@@ -179,11 +196,11 @@ public class PTriggerListener implements org.bukkit.event.Listener {
                     if (pTT == PTriggerType.LEFT) {
                         if (dropBlockUUIDSet.contains(p.getUniqueId())) {
                             dropBlockUUIDSet.remove(p.getUniqueId());
-                            this.stop();
+                            this.forceStop();
                             return;
                         }
                     }
-                    PTrigger.trigger(p, pTT, PTriggerSubType.INIT);
+                    PTrigger.trigger(p, pTT, PTriggerSubType.INIT, this.triggerTickTime);
                 }
 
                 @Override
@@ -197,7 +214,7 @@ public class PTriggerListener implements org.bukkit.event.Listener {
             return PTrigger.checkTriggerCancel(p, pTT);
         }
         if (pTaskMap.containsKey(key)) {
-            pTaskMap.get(key).setLifeTime(pTT.holdDetectDelay);
+            pTaskMap.get(key).setLifeTickTime(pTT.holdDetectDelay);
         } else {
             pTaskMap.put(key, new PTask() {
                 @Override
@@ -209,18 +226,18 @@ public class PTriggerListener implements org.bukkit.event.Listener {
                             return;
                         }
                     }
-                    PTrigger.trigger(p, pTT, PTriggerSubType.INIT);
+                    PTrigger.trigger(p, pTT, PTriggerSubType.INIT, this.triggerTickTime);
                 }
 
                 @Override
                 public void hold() {
-                    PTrigger.trigger(p, pTT, PTriggerSubType.HOLD);
+                    PTrigger.trigger(p, pTT, PTriggerSubType.HOLD, this.triggerTickTime);
                 }
 
                 @Override
                 public void goal() {
-                    if (this.lifeTime <= 0L) {
-                        PTrigger.trigger(p, pTT, PTriggerSubType.GOAL);
+                    if (this.lifeTickTime <= 0L) {
+                        PTrigger.trigger(p, pTT, PTriggerSubType.GOAL, this.triggerTickTime);
                     }
                     pTaskMap.remove(key);
                 }

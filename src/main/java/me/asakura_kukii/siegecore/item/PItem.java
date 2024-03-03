@@ -20,7 +20,7 @@ public class PItem extends PAbstractItem {
     public PItem() {}
 
     @Override
-    public void trigger(Player p, PTriggerType pTT, PTriggerSubType pTST, PTriggerSlot pTS, ItemStack iS) {
+    public void trigger(Player p, PTriggerType pTT, PTriggerSubType pTST, PTriggerSlot pTS, ItemStack iS, long hTT) {
     }
 
     @Override
@@ -33,5 +33,13 @@ public class PItem extends PAbstractItem {
 
     @Override
     public void defaultValue() {
+    }
+
+    @Override
+    public void load() {
+    }
+
+    @Override
+    public void unload() {
     }
 }
